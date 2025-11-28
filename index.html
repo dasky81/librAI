@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="it" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>LibrAI • Motore Intelligente</title>
+  <meta name="description" content="Motore di ricerca libri potenziato da AI">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* --- STESSO CSS DI PRIMA --- */
+    :root {
+      --bg-body: #0f172a;
+      --bg-card: #1e293b;
+      --bg-nav: rgba(15, 23, 42, 0.85);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: rgba(148, 163, 184, 0.2);
+      --primary: #0ea5e9;
+      --primary-glow: rgba(14, 165, 233, 0.4);
+      --secondary: #6366f1;
+      --success: #22c55e;
+      --warning: #fbbf24;
+      --danger: #ef4444;
+      --radius-l: 24px;
+      --radius-m: 16px;
+      --radius-s: 12px;
+      --shadow-card: 0 10px 40px -10px rgba(0,0,0,0.5);
+      --font-main: "Plus Jakarta Sans", sans-serif;
+    }
+
+    [data-theme="light"] {
+      --bg-body: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-nav: rgba(255, 255, 255, 0.85);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --shadow-card: 0 10px 30px -10px rgba(148, 163, 184, 0.3);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      margin: 0;
+      font-family: var(--font-main);
+      background: var(--bg-body);
+      color: var(--text-main);
+      transition: background 0.3s ease, color 0.3s ease;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    button { font-family: inherit; border: none; background: none; cursor: pointer; }
+    a { text-decoration: none; color: inherit; }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: 72px;
+      background: var(--bg-nav);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+    }
+    
+    .nav-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 1.4rem;
+      cursor: pointer;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 0.9rem;
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+
+    .brand-text {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .brand-text span {
+      font-weight: 800;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .theme-toggle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+    }
+    .theme-toggle:hover {
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .view {
+      display: none;
+      animation: fadeIn 0.4s ease-out;
+      padding-bottom: 6rem;
+    }
+    .view.active { display: block; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero {
+      text-align: center;
+      padding: 4.5rem 0 2.5rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .hero h1 {
+      font-size: clamp(2.5rem, 5vw, 3.8rem);
+      line-height: 1.1;
+      margin-bottom: 1.2rem;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+    }
+
+    .gradient-text {
+      background: linear-gradient(to right, var(--text-main), var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      margin-bottom: 3rem;
+      line-height: 1.6;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .search-wrapper {
+      position: relative;
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 1.2rem 1.5rem;
+      padding-right: 4rem;
+      border-radius: 99px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      font-size: 1.1rem;
+      box-shadow: var(--shadow-card);
+      outline: none;
+      transition: all 0.2s;
+    }
+    
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px var(--primary-glow);
+    }
+
+    .search-btn-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 46px;
+      height: 46px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      transition: 0.2s;
+    }
+    .search-btn-icon:hover { transform: translateY(-50%) scale(1.05); background: var(--secondary); }
+
+    .tags-container {
+      display: flex;
+      justify-content: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+    
+    .tag-chip {
+      padding: 0.6rem 1.2rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 99px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+    
+    .tag-chip:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: rgba(14, 165, 233, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .books-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .book-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-l);
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .book-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-card);
+      border-color: var(--primary);
+    }
+
+    .book-header {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .book-cover {
+      width: 80px;
+      height: 110px;
+      border-radius: var(--radius-s);
+      background: linear-gradient(135deg, #475569, #1e293b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      flex-shrink: 0;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+
+    .book-meta {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .book-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      line-height: 1.3;
+      margin: 0 0 0.3rem 0;
+    }
+
+    .book-author {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .rating {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .star { color: var(--warning); }
+
+    .book-desc-preview {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .book-footer {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .price-badge {
+      font-weight: 700;
+      color: var(--success);
+      font-size: 1.1rem;
+    }
+
+    .action-link {
+      font-size: 0.85rem;
+      color: var(--primary);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .modal-overlay.open { display: flex; opacity: 1; }
+
+    .modal-card {
+      background: var(--bg-body);
+      width: 90%;
+      max-width: 650px;
+      max-height: 90vh;
+      border-radius: var(--radius-l);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow-y: auto;
+      transform: scale(0.95);
+      transition: transform 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-overlay.open .modal-card { transform: scale(1); }
+
+    .close-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      z-index: 20;
+      cursor: pointer;
+    }
+
+    .modal-content { 
+      padding: 2.5rem; 
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .tab-nav {
+      display: flex;
+      gap: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 1.5rem;
+    }
+    .tab-btn {
+      padding: 0.5rem 0;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+      border-bottom: 2px solid transparent;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; animation: fadeIn 0.3s ease-out; }
+
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .chat-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      height: 250px;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    .chat-message {
+      padding: 0.8rem 1rem;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      max-width: 85%;
+    }
+    .chat-message.user {
+      align-self: flex-end;
+      background: rgba(14, 165, 233, 0.15);
+      color: var(--text-main);
+      border: 1px solid rgba(14, 165, 233, 0.3);
+    }
+    .chat-message.ai {
+      align-self: flex-start;
+      background: var(--bg-body);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+    }
+    .chat-input-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .chat-input {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 99px;
+      padding: 0.7rem 1.2rem;
+      color: var(--text-main);
+      outline: none;
+    }
+    .chat-input:focus { border-color: var(--primary); }
+    .chat-send-btn {
+      background: var(--primary);
+      color: #fff;
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+    .chat-send-btn:hover { transform: scale(1.05); }
+
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-card) 25%, var(--border-color) 50%, var(--bg-card) 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: 8px;
+    }
+    @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    .ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.8rem;
+      background: rgba(14, 165, 233, 0.1);
+      color: var(--primary);
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+      border: 1px solid rgba(14, 165, 233, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .loader-spinner {
+      border: 3px solid rgba(255,255,255,0.1);
+      border-left-color: var(--primary);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    
+    .btn-amazon {
+      width: 100%;
+      background: #f59e0b;
+      background: linear-gradient(to bottom right, #f59e0b, #d97706);
+      color: #fff;
+      font-weight: 700;
+      padding: 1rem;
+      border-radius: 12px;
+      margin-top: 1.5rem;
+      font-size: 1rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+    }
+    .btn-amazon:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(245, 158, 11, 0.5);
+    }
+
+    .feature-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-top: 1.5rem;
+    }
+    .feature-btn {
+      font-size: 0.85rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--bg-body);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: 0.2s;
+      flex: 1;
+      justify-content: center;
+      min-width: 140px;
+    }
+    .feature-btn:hover {
+      border-color: var(--secondary);
+      color: var(--secondary);
+      background: rgba(99, 102, 241, 0.05);
+    }
+    .ai-result-box {
+      margin-top: 1rem;
+      padding: 1.2rem;
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      color: var(--text-main);
+      display: none;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .ai-result-box h4 { margin-top: 0; color: var(--primary); }
+    .ai-result-box ul { padding-left: 1.2rem; margin-bottom: 0; }
+    .ai-result-box li { margin-bottom: 0.5rem; }
+    
+    .quote-style {
+      font-style: italic;
+      border-left: 3px solid var(--secondary);
+      padding-left: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <nav class="navbar">
+    <div class="container nav-content">
+      <div class="brand" onclick="app.router('home')">
+        <div class="brand-icon">AI</div>
+        <div class="brand-text">Libr<span>AI</span></div>
+      </div>
+      <button class="theme-toggle" id="themeBtn" aria-label="Cambia tema">
+        ☀
+      </button>
+    </div>
+  </nav>
+
+  <main class="container">
+    
+    <!-- VIEW: HOME -->
+    <section id="view-home" class="view active">
+      <div class="hero">
+        <h1>Trova il libro perfetto con <span class="gradient-text">LibrAI</span></h1>
+        <p>L'intelligenza artificiale che legge, analizza e confronta i prezzi per te. Inserisci un argomento o un titolo e lascia fare a noi.</p>
+        
+        <div class="search-wrapper">
+          <input type="text" class="search-input" id="mainSearchInput" placeholder="Es. 'Romanzi gialli psicologici' o 'Marketing per PMI'..." />
+          <button class="search-btn-icon" onclick="app.handleSearch()" id="searchBtn">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+
+        <div class="tags-container">
+          <button class="tag-chip" onclick="app.searchTag('Business & Startup')">💼 Business</button>
+          <button class="tag-chip" onclick="app.searchTag('Psicologia Cognitiva')">🧠 Psicologia</button>
+          <button class="tag-chip" onclick="app.searchTag('Thriller Nordici')">❄️ Thriller</button>
+          <button class="tag-chip" onclick="app.searchTag('Futuro e AI')">🚀 Futuro</button>
+        </div>
+      </div>
+
+      <div style="margin-top: 3rem;">
+        <h3 style="font-weight:800; margin-bottom:1rem; font-size:1.5rem;">I più richiesti oggi</h3>
+        <div class="books-grid" id="featured-grid">
+          <!-- JS Insert -->
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: RISULTATI RICERCA -->
+    <section id="view-search" class="view">
+      <div style="margin-top: 2rem; display: flex; align-items: center; gap: 1rem;">
+        <button onclick="app.router('home')" style="color:var(--text-muted); font-weight:600; display:flex; align-items:center; gap:0.5rem; padding:0.5rem 0;">
+          ← Torna alla Home
+        </button>
+      </div>
+      <h2 style="margin: 1rem 0; font-size: 2rem;">Risultati per: <span class="gradient-text" id="query-display">...</span></h2>
+      
+      <div id="loading-indicator" style="display:none; text-align:center; padding: 6rem 0;">
+        <div style="display:inline-block; margin-bottom:1.5rem;" class="loader-spinner"></div>
+        <p style="color:var(--text-muted); font-size:1.1rem;">LibrAI sta analizzando migliaia di titoli...</p>
+      </div>
+
+      <div class="books-grid" id="results-grid">
+        <!-- JS Insert -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="bookModal">
+    <div class="modal-card">
+      <button class="close-btn" onclick="app.closeModal()">×</button>
+      <div class="modal-content" id="modal-content-area">
+        <!-- Content will be injected here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Configurazione: l'API Key è ora gestita dal backend Vercel (/api/generate)
+    const referralTag = "filmshokblogs-21"; 
+    
+    const FEATURED_DB = [
+      {
+        id: 101,
+        title: "Atomic Habits",
+        author: "James Clear",
+        tags: ["Crescita", "Abitudini"],
+        rating: 4.8,
+        price: 15.90,
+        oldPrice: 22.00,
+        color: "linear-gradient(135deg, #f59e0b, #d97706)",
+        summary: "Se ti sei mai chiesto perché è così difficile andare in palestra regolarmente, questo libro è la risposta definitiva. Clear non ti dà regole astratte, ma un manuale pratico per hackerare il tuo cervello un 1% alla volta."
+      },
+      {
+        id: 102,
+        title: "L'Arte della Guerra",
+        author: "Sun Tzu",
+        tags: ["Strategia", "Classici"],
+        rating: 4.6,
+        price: 9.90,
+        oldPrice: 12.00,
+        color: "linear-gradient(135deg, #ef4444, #b91c1c)",
+        summary: "Non è solo per generali antichi: è per chiunque voglia vincere una discussione, una trattativa o una sfida senza neanche dover combattere. Un classico che ti insegna a essere più furbo del tuo avversario."
+      },
+      {
+        id: 103,
+        title: "Sapiens",
+        author: "Yuval Noah Harari",
+        tags: ["Storia", "Umanità"],
+        rating: 4.9,
+        price: 18.00,
+        oldPrice: 24.00,
+        color: "linear-gradient(135deg, #10b981, #059669)",
+        summary: "Ti farà sentire piccolo e potente allo stesso tempo. Harari ti spiega come siamo passati dall'essere scimmie insignificanti a dominatori del mondo (spoiler: è tutta colpa della nostra capacità di inventare storie)."
+      },
+      {
+        id: 104,
+        title: "1984",
+        author: "George Orwell",
+        tags: ["Romanzo", "Distopia"],
+        rating: 4.8,
+        price: 10.50,
+        oldPrice: 14.00,
+        color: "linear-gradient(135deg, #475569, #1e293b)",
+        summary: "Fa venire i brividi perché sembra scritto oggi. Se vuoi capire come il controllo dell'informazione modella la realtà, devi leggere la storia del Grande Fratello. Ti lascerà un segno indelebile."
+      },
+      {
+        id: 105,
+        title: "Pensieri Lenti e Veloci",
+        author: "Daniel Kahneman",
+        tags: ["Psicologia", "Mente"],
+        rating: 4.7,
+        price: 16.90,
+        oldPrice: 22.00,
+        color: "linear-gradient(135deg, #3b82f6, #1d4ed8)",
+        summary: "Credevi di essere una persona razionale? Sbagliato. Kahneman ti smonta pezzo per pezzo, mostrandoti come il tuo cervello ti inganna ogni giorno. Fondamentale per prendere decisioni migliori."
+      },
+      {
+        id: 106,
+        title: "L'Arte della Vittoria",
+        author: "Phil Knight",
+        tags: ["Biografia", "Business"],
+        rating: 4.9,
+        price: 14.00,
+        oldPrice: 19.00,
+        color: "linear-gradient(135deg, #0ea5e9, #0284c7)",
+        summary: "La storia folle dietro la Nike. Niente lezioni noiose di business, ma un'avventura vera fatta di debiti, rischi assurdi e passione pura. Ti sembrerà di correre al fianco del fondatore."
+      },
+      {
+        id: 107,
+        title: "Psicologia dei Soldi",
+        author: "Morgan Housel",
+        tags: ["Finanza", "Mindset"],
+        rating: 4.7,
+        price: 13.50,
+        oldPrice: 18.00,
+        color: "linear-gradient(135deg, #14b8a6, #0f766e)",
+        summary: "I soldi non sono fogli di calcolo, sono emozioni. Housel spiega perché persone intelligenti fanno cose stupide con il denaro e come puoi evitare di essere uno di loro. Semplice e illuminante."
+      },
+      {
+        id: 108,
+        title: "Steve Jobs",
+        author: "Walter Isaacson",
+        tags: ["Biografia", "Tech"],
+        rating: 4.8,
+        price: 19.00,
+        oldPrice: 25.00,
+        color: "linear-gradient(135deg, #6366f1, #4f46e5)",
+        summary: "Non è la solita santificazione di un genio, ma il ritratto crudo di un uomo difficile che ha piegato la realtà al suo volere. Ti ispirerà a cercare la perfezione, anche a costo di essere scomodo."
+      },
+      {
+        id: 109,
+        title: "Deep Work",
+        author: "Cal Newport",
+        tags: ["Produttività", "Focus"],
+        rating: 4.6,
+        price: 17.50,
+        oldPrice: 23.00,
+        color: "linear-gradient(135deg, #e11d48, #be123c)",
+        summary: "In un mondo pieno di notifiche, chi sa concentrarsi ha un superpotere. Newport ti insegna come spegnere il rumore e fare il lavoro che conta davvero. È come una doccia fredda per la tua produttività."
+      }
+    ];
+
+    let CURRENT_RESULTS = [];
+    let CURRENT_ACTIVE_BOOK = null;
+
+    const app = {
+      state: {
+        theme: 'dark'
+      },
+
+      init() {
+        const savedTheme = localStorage.getItem('librai_theme') || 'dark';
+        this.setTheme(savedTheme);
+
+        this.renderCards(FEATURED_DB, 'featured-grid');
+
+        document.getElementById('themeBtn').onclick = () => this.toggleTheme();
+        document.getElementById('mainSearchInput').addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') this.handleSearch();
+        });
+        
+        document.getElementById('bookModal').onclick = (e) => {
+          if (e.target.id === 'bookModal') this.closeModal();
+        }
+      },
+
+      router(viewName) {
+        document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+        document.getElementById('view-' + viewName).classList.add('active');
+        window.scrollTo(0,0);
+      },
+
+      async handleSearch() {
+        const query = document.getElementById('mainSearchInput').value.trim();
+        if (!query) return;
+        this.searchTag(query);
+      },
+
+      async searchTag(query) {
+        document.getElementById('mainSearchInput').value = query;
+        document.getElementById('query-display').textContent = query;
+        
+        const grid = document.getElementById('results-grid');
+        const loader = document.getElementById('loading-indicator');
+        grid.innerHTML = '';
+        loader.style.display = 'block';
+        this.router('search');
+
+        try {
+          const results = await this.fetchBooksFromBackend(query);
+          
+          loader.style.display = 'none';
+          
+          if (results && results.length > 0) {
+            CURRENT_RESULTS = results;
+            this.renderCards(results, 'results-grid');
+          } else {
+            grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:3rem; font-size:1.1rem;">
+              Non ho trovato libri specifici, prova a riformulare la ricerca in modo diverso.
+            </div>`;
+          }
+
+        } catch (error) {
+          console.error("Errore ricerca:", error);
+          loader.style.display = 'none';
+          grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--warning); padding:3rem;">
+            Si è verificato un errore di connessione con l'AI.<br><small>${error.message}</small>
+          </div>`;
+        }
+      },
+
+      async fetchBooksFromBackend(userQuery) {
+        // CHIAMATA AL BACKEND VERCEL
+        const url = '/api/generate';
+        
+        const prompt = `
+          Sei LibrAI, un amico esperto di libri che dà consigli caldi e appassionati.
+          L'utente cerca: "${userQuery}".
+          Genera un array JSON valido contenente esattamente 6 libri reali che corrispondono meglio.
+          
+          Ogni oggetto deve avere questa struttura:
+          {
+            "id": numero univoco,
+            "title": "Titolo Italiano",
+            "author": "Autore",
+            "tags": ["Tag1", "Tag2"],
+            "rating": float (3.5-5.0),
+            "price": prezzo attuale float,
+            "oldPrice": prezzo copertina float,
+            "summary": "Scrivi una descrizione molto umana, discorsiva e coinvolgente di 2-3 frasi. Non fare un riassunto scolastico, ma spiega perché vale la pena leggerlo, come se lo stessi consigliando davanti a un caffè. Usa un tono caldo e diretto.",
+            "color": "stringa css gradient (es linear-gradient...)"
+          }
+          Rispondi SOLO con il JSON raw.
+        `;
+
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: prompt })
+          });
+
+          if (!response.ok) throw new Error("Errore API Backend");
+
+          const data = await response.json();
+          // Il backend restituisce { candidates: [...] } come Gemini
+          let text = data.candidates[0].content.parts[0].text;
+          text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+          return JSON.parse(text);
+        } catch (e) {
+          console.error(e);
+          return [{
+            id: 999,
+            title: "Errore di Connessione",
+            author: "Sistema LibrAI",
+            tags: ["Errore"],
+            rating: 0,
+            price: 0,
+            oldPrice: 0,
+            summary: "Assicurati di aver configurato correttamente il backend su Vercel.",
+            color: "linear-gradient(135deg, #333, #000)"
+          }];
+        }
+      },
+
+      renderCards(books, containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = books.map(book => `
+          <div class="book-card" onclick="app.openModal(${book.id}, '${containerId === 'featured-grid' ? 'featured' : 'search'}')">
+            <div class="book-header">
+              <div class="book-cover" style="background:${book.color}">📖</div>
+              <div class="book-meta">
+                <h3 class="book-title">${book.title}</h3>
+                <div class="book-author">${book.author}</div>
+                <div class="rating">
+                  <span class="star">★</span> ${book.rating}
+                </div>
+              </div>
+            </div>
+            <p class="book-desc-preview">${book.summary}</p>
+            <div class="book-footer">
+              <div class="price-badge">${book.price.toFixed(2)}€</div>
+              <div class="action-link">Riassunto →</div>
+            </div>
+          </div>
+        `).join('');
+      },
+
+      openModal(id, source) {
+        let book;
+        if (source === 'featured') {
+          book = FEATURED_DB.find(b => b.id === id);
+        } else {
+          book = CURRENT_RESULTS.find(b => b.id === id);
+        }
+
+        if (!book) return;
+        
+        CURRENT_ACTIVE_BOOK = book;
+
+        const modal = document.getElementById('bookModal');
+        const content = document.getElementById('modal-content-area');
+        
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+
+        content.innerHTML = `
+          <div style="display:flex; gap:1.5rem; margin-bottom:2rem;">
+            <div class="skeleton" style="width:100px; height:140px; border-radius:12px;"></div>
+            <div style="flex:1;">
+              <div class="skeleton" style="height:30px; width:70%; margin-bottom:10px;"></div>
+              <div class="skeleton" style="height:20px; width:40%; margin-bottom:20px;"></div>
+            </div>
+          </div>
+          <div class="skeleton" style="height:200px; width:100%; border-radius:12px;"></div>
+        `;
+
+        const cleanTitle = book.title.replace(/[^\w\s]/gi, ''); 
+        const searchQuery = encodeURIComponent(`${cleanTitle} ${book.author}`);
+        const amazonLink = `https://www.amazon.it/s?k=${searchQuery}&tag=${referralTag}`;
+
+        setTimeout(() => {
+          content.innerHTML = `
+            <div style="display:flex; flex-wrap:wrap; gap:1.5rem; margin-bottom:1.5rem;">
+              <div style="width:100px; height:140px; border-radius:12px; background:${book.color}; display:flex; align-items:center; justify-content:center; font-size:2.5rem; box-shadow:0 10px 25px rgba(0,0,0,0.4);">
+                📖
+              </div>
+              <div style="flex:1; min-width:200px;">
+                <div class="ai-badge">✨ LibrAI Analysis</div>
+                <h1 style="margin:0 0 0.5rem 0; font-size:1.8rem; line-height:1.2; font-weight:800;">${book.title}</h1>
+                <p style="color:var(--text-muted); font-size:1.1rem;">di ${book.author}</p>
+                <div style="margin-top:1rem; display:flex; align-items:center; gap:1rem;">
+                  <span style="font-size:1.6rem; font-weight:800; color:var(--success);">${book.price.toFixed(2)}€</span>
+                  <span style="text-decoration:line-through; color:var(--text-muted); font-size:1rem;">${book.oldPrice.toFixed(2)}€</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-nav">
+              <div class="tab-btn active" onclick="app.switchTab('overview', this)">Panoramica</div>
+              <div class="tab-btn" onclick="app.switchTab('chat', this)">💬 Chiedi al Libro</div>
+            </div>
+
+            <div id="tab-overview" class="tab-panel active">
+              <div style="background:var(--bg-card); border:1px solid var(--primary); padding:1.5rem; border-radius:16px; position:relative;">
+                <div style="position:absolute; top:-12px; left:20px; background:var(--bg-body); padding:0 12px; color:var(--primary); font-weight:700; font-size:0.8rem; border:1px solid var(--primary); border-radius:99px;">
+                  SINTESI INTELLIGENTE
+                </div>
+                <p style="line-height:1.7; color:var(--text-main); margin-top:0.5rem;">
+                  ${book.summary} <br><br>
+                  L'algoritmo LibrAI ha rilevato un rating di <strong>${book.rating}/5.0</strong>. È particolarmente consigliato per chi si interessa di: <em>${book.tags.join(', ')}</em>.
+                </p>
+                
+                <div class="feature-grid">
+                  <button class="feature-btn" onclick="app.generateQuotes(this)">
+                    <span>📜 ✨ Estrai Citazioni</span>
+                  </button>
+                  <button class="feature-btn" onclick="app.generateProsCons(this)">
+                    <span>⚖️ ✨ Pro & Contro</span>
+                  </button>
+                  <button class="feature-btn" onclick="app.generateStudyPlan(this)">
+                    <span>📅 ✨ Piano di Lettura</span>
+                  </button>
+                </div>
+
+                <div class="ai-result-box quote-style" id="quote-result"></div>
+                <div class="ai-result-box" id="pros-cons-result"></div>
+                <div class="ai-result-box" id="study-plan-result"></div>
+
+              </div>
+              
+              <a href="${amazonLink}" target="_blank" class="btn-amazon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352 2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.702 3.702 0 0 0 1.599-2.431H8v-3.08h7.545z"/>
+                </svg>
+                Acquista su Amazon.it
+              </a>
+              <p style="text-align:center; font-size:0.75rem; color:var(--text-muted); margin-top:0.6rem; opacity:0.7;">
+                Acquistando tramite questo link supporti LibrAI senza costi aggiuntivi.
+              </p>
+            </div>
+
+            <div id="tab-chat" class="tab-panel">
+               <div class="chat-container">
+                 <div class="chat-box" id="chat-box-area">
+                   <div class="chat-message ai">
+                     Ciao! Sono un esperto di <em>${book.title}</em>. Hai domande sulla trama o sui concetti chiave?
+                   </div>
+                 </div>
+                 <div class="chat-input-row">
+                   <input type="text" id="chat-input" class="chat-input" placeholder="Chiedi qualcosa..." onkeypress="if(event.key === 'Enter') app.sendChatMessage()">
+                   <button class="chat-send-btn" onclick="app.sendChatMessage()">➤</button>
+                 </div>
+               </div>
+            </div>
+          `;
+        }, 300);
+      },
+
+      closeModal() {
+        document.getElementById('bookModal').classList.remove('open');
+        document.body.style.overflow = '';
+        CURRENT_ACTIVE_BOOK = null;
+      },
+
+      switchTab(tabName, btn) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+      },
+      
+      async generateQuotes(btn) {
+        this.runAIButton(btn, 'quote-result', 
+          `Estrai 3 citazioni famose, brevi e ispirazionali dal libro "${CURRENT_ACTIVE_BOOK.title}" di ${CURRENT_ACTIVE_BOOK.author}. Restituisci solo le citazioni in testo semplice separandole con un a capo.`,
+          text => text.replace(/\n/g, '<br><br>')
+        );
+      },
+
+      async generateProsCons(btn) {
+        this.runAIButton(btn, 'pros-cons-result',
+          `Analizza il libro "${CURRENT_ACTIVE_BOOK.title}" di ${CURRENT_ACTIVE_BOOK.author}. Elenca 3 punti di forza (PRO) e 3 punti deboli (CONTRO) in italiano. Restituisci una lista HTML usando <ul> e <li> con titoli in <b>.`,
+          text => `<h4>⚖️ Analisi Critica</h4>${text}`
+        );
+      },
+
+      async generateStudyPlan(btn) {
+        this.runAIButton(btn, 'study-plan-result',
+          `Crea un piano di lettura rapido di 5 giorni per il libro "${CURRENT_ACTIVE_BOOK.title}" di ${CURRENT_ACTIVE_BOOK.author}. Per ogni giorno indica quali capitoli o concetti leggere. Restituisci una lista HTML pulita usando <ul> e <li>.`,
+          text => `<h4>📅 Piano di Lettura (5 Giorni)</h4>${text}`
+        );
+      },
+
+      async runAIButton(btn, resultId, prompt, formatCallback) {
+        if(!CURRENT_ACTIVE_BOOK) return;
+        const originalText = btn.innerText;
+        btn.innerHTML = `<div class="loader-spinner" style="width:14px; height:14px; border-width:2px;"></div> Caricamento...`;
+        btn.disabled = true;
+
+        document.querySelectorAll('.ai-result-box').forEach(el => el.style.display = 'none');
+
+        // CHIAMATA AL BACKEND VERCEL
+        const url = '/api/generate';
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: prompt })
+            });
+            const data = await response.json();
+            let text = data.candidates[0].content.parts[0].text;
+            
+            text = text.replace(/```html/g, '').replace(/```/g, '');
+
+            const resultBox = document.getElementById(resultId);
+            resultBox.innerHTML = formatCallback(text);
+            resultBox.style.display = 'block';
+            
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        } catch (e) {
+            console.error(e);
+            btn.innerHTML = `Errore. Riprova.`;
+            setTimeout(() => { btn.innerHTML = originalText; btn.disabled = false; }, 2000);
+        }
+      },
+
+      async sendChatMessage() {
+        const input = document.getElementById('chat-input');
+        const box = document.getElementById('chat-box-area');
+        const msg = input.value.trim();
+        
+        if(!msg || !CURRENT_ACTIVE_BOOK) return;
+
+        box.innerHTML += `<div class="chat-message user">${msg}</div>`;
+        input.value = '';
+        box.scrollTop = box.scrollHeight;
+
+        const loadingId = 'loading-' + Date.now();
+        box.innerHTML += `<div class="chat-message ai" id="${loadingId}">...</div>`;
+        box.scrollTop = box.scrollHeight;
+
+        // CHIAMATA AL BACKEND VERCEL
+        const url = '/api/generate';
+        const prompt = `Sei un esperto del libro "${CURRENT_ACTIVE_BOOK.title}" di ${CURRENT_ACTIVE_BOOK.author}. L'utente chiede: "${msg}". Rispondi in italiano in modo utile, preciso e amichevole. Sii conciso.`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: prompt })
+            });
+            const data = await response.json();
+            const text = data.candidates[0].content.parts[0].text;
+            
+            document.getElementById(loadingId).innerText = text;
+        } catch (e) {
+            document.getElementById(loadingId).innerText = "Mi dispiace, non riesco a connettermi al database della conoscenza in questo momento.";
+        }
+        box.scrollTop = box.scrollHeight;
+      },
+
+      toggleTheme() {
+        const newTheme = this.state.theme === 'dark' ? 'light' : 'dark';
+        this.setTheme(newTheme);
+      },
+      setTheme(theme) {
+        this.state.theme = theme;
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('librai_theme', theme);
+        document.getElementById('themeBtn').textContent = theme === 'dark' ? '☀' : '🌙';
+      }
+    };
+
+    app.init();
+  </script>
+</body>
+</html>
