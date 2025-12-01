@@ -348,6 +348,7 @@
 
   <script>
     const referralTag = "filmshokblogs-21"; 
+    const apiKey = "";
     
     // DB Ampliato per la rotazione giornaliera
     const FULL_DB = [
@@ -421,7 +422,7 @@
 
       renderDailyBook(book) {
         const container = document.getElementById('daily-container');
-        const bookStr = JSON.stringify(book).replace(/"/g, '&quot;');
+        const bookStr = JSON.stringify(book).replace(/'/g, "&#39;").replace(/"/g, '&quot;');
         
         container.innerHTML = `
           <div class="daily-card" onclick='app.openModalFromObj(${bookStr})'>
@@ -556,11 +557,16 @@
         Struttura array oggetti: {id (numero), title, author, tags[], rating (float), price (float), oldPrice, summary (string), color (css gradient)}. Rispondi solo JSON.`;
         
         try {
-          const res = await fetch('/api/generate', {
+          // Direct API call
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+          const res = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt })
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
           });
+          
+          if (!res.ok) throw new Error("Errore API Gemini");
+
           const data = await res.json();
           let text = data.candidates[0].content.parts[0].text;
           text = text.replace(/```json/g, '').replace(/```/g, '').trim();
@@ -575,7 +581,7 @@
       renderCards(books, containerId) {
         const container = document.getElementById(containerId);
         container.innerHTML = books.map(book => {
-          const bookStr = JSON.stringify(book).replace(/"/g, '&quot;');
+          const bookStr = JSON.stringify(book).replace(/'/g, "&#39;").replace(/"/g, '&quot;');
           const isFav = this.isFav(book.id);
           return `
           <div class="book-card" onclick='app.openModalFromObj(${bookStr})'>
@@ -679,9 +685,12 @@
         btn.innerText = "Caricamento..."; btn.disabled = true;
         
         try {
-          const res = await fetch('/api/generate', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: prompts[type] })
+          // Direct API call
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompts[type] }] }] })
           });
           const data = await res.json();
           const text = data.candidates[0].content.parts[0].text.replace(/```html/g,'').replace(/```/g,'');
@@ -704,9 +713,12 @@
         box.scrollTop = box.scrollHeight;
 
         try {
-          const res = await fetch('/api/generate', {
-            method: 'POST', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ prompt: `Esperto libro "${CURRENT_ACTIVE_BOOK.title}". User: "${msg}". Risposta breve italiano. NON FARE SPOILER SUL FINALE.` })
+          // Direct API call
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ contents: [{ parts: [{ text: `Esperto libro "${CURRENT_ACTIVE_BOOK.title}". User: "${msg}". Risposta breve italiano. NON FARE SPOILER SUL FINALE.` }] }] })
           });
           const data = await res.json();
           const text = data.candidates[0].content.parts[0].text;
