@@ -1,746 +1,638 @@
 <!DOCTYPE html>
-<html lang="it" data-theme="dark">
+<html lang="it" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-  
-  <title>LibrAI • Il tuo assistente di lettura intelligente</title>
-  <meta name="description" content="Trova il tuo prossimo libro preferito con l'AI. Analisi, riassunti, piani di lettura e comparazione prezzi in un click.">
-  <meta name="keywords" content="libri, AI, recensioni libri, consigli lettura, sconti libri">
-  
-  <meta property="og:title" content="LibrAI • Scopri libri con l'Intelligenza Artificiale">
-  <meta property="og:description" content="Non sai cosa leggere? Chiedi a LibrAI. Ottieni riassunti, pro & contro e piani di studio in secondi.">
-  <meta property="og:image" content="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=1200&q=80">
-  <meta property="og:url" content="https://librai.app">
-  <meta property="og:type" content="website">
-  
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="LibrAI • Book Discovery Engine">
-  <meta name="twitter:description" content="Il modo più smart per scegliere il prossimo libro.">
-  <meta name="twitter:image" content="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=1200&q=80">
-  
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>LibrAI • Il tuo Assistente di Lettura</title>
+  <meta name="description" content="Trova il tuo prossimo libro preferito. Analisi, riassunti e consigli personalizzati.">
+
+  <!-- FONTS & ICONS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'], display: ['"Outfit"', 'sans-serif'] },
+          colors: {
+            primary: '#0f172a',
+            accent: '#0ea5e9',
+            brand: { fiction: '#8b5cf6', nonfic: '#f59e0b', classic: '#ef4444', ai: '#3b82f6' }
+          },
+          animation: {
+            'fade-up': 'fadeUp 0.6s ease-out forwards',
+            'shimmer': 'shimmer 2s linear infinite',
+          },
+          keyframes: {
+            fadeUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+            shimmer: { '0%': { backgroundPosition: '-1000px 0' }, '100%': { backgroundPosition: '1000px 0' } }
+          },
+          backgroundImage: {
+            'noise': "url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.05%22/%3E%3C/svg%3E')",
+          }
+        }
+      }
+    }
+  </script>
 
   <style>
-    /* --- STILI BASE --- */
-    :root {
-      --bg-body: #0f172a;
-      --bg-card: #1e293b;
-      --bg-nav: rgba(15, 23, 42, 0.85);
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --border-color: rgba(148, 163, 184, 0.2);
-      --primary: #0ea5e9;
-      --primary-glow: rgba(14, 165, 233, 0.4);
-      --secondary: #6366f1;
-      --success: #22c55e;
-      --warning: #fbbf24;
-      --danger: #ef4444;
-      --radius-l: 24px;
-      --font-main: "Plus Jakarta Sans", sans-serif;
-    }
-
-    [data-theme="light"] {
-      --bg-body: #f8fafc;
-      --bg-card: #ffffff;
-      --bg-nav: rgba(255, 255, 255, 0.85);
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --border-color: #e2e8f0;
-    }
-
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body { margin: 0; font-family: var(--font-main); background: var(--bg-body); color: var(--text-main); overflow-x: hidden; min-height: 100vh; }
-    button { font-family: inherit; border: none; background: none; cursor: pointer; }
-    a { text-decoration: none; color: inherit; }
-
-    /* --- LAYOUT --- */
-    .container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+    .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.6); }
+    .glass-dark { background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .skeleton { background: #f6f7f8; background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%); background-repeat: no-repeat; background-size: 1000px 100%; animation: shimmer 1.5s infinite linear forwards; }
     
-    .navbar {
-      position: sticky; top: 0; z-index: 100; height: 72px;
-      background: var(--bg-nav); backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border-color);
-      display: flex; align-items: center;
-    }
-    .nav-content { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-
-    .brand { display: flex; align-items: center; gap: 0.6rem; font-size: 1.4rem; cursor: pointer; letter-spacing: -0.02em; }
-    .brand-icon { width: 38px; height: 38px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 0.9rem; box-shadow: 0 0 20px var(--primary-glow); }
-    .brand-text { font-weight: 600; }
-    .brand-text span { font-weight: 800; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-    .nav-actions { display: flex; align-items: center; gap: 1rem; }
-    .nav-btn { position: relative; font-size: 1.2rem; color: var(--text-muted); padding: 8px; border-radius: 50%; transition: 0.2s; }
-    .nav-btn:hover { color: var(--primary); background: rgba(14, 165, 233, 0.1); }
-    .nav-badge { position: absolute; top: 4px; right: 4px; background: var(--danger); color: white; font-size: 0.6rem; font-weight: 700; padding: 2px 5px; border-radius: 99px; display: none; }
-
-    /* --- VIEWS --- */
-    .view { display: none; padding-bottom: 6rem; animation: fadeIn 0.4s ease-out; }
-    .view.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* --- HERO --- */
-    .hero { text-align: center; padding: 4.5rem 0 2rem; max-width: 800px; margin: 0 auto; }
-    .hero h1 { font-size: clamp(2.5rem, 5vw, 3.8rem); line-height: 1.1; margin-bottom: 1.2rem; font-weight: 800; }
-    .gradient-text { background: linear-gradient(to right, var(--text-main), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .hero p { font-size: 1.15rem; color: var(--text-muted); margin-bottom: 2.5rem; line-height: 1.6; max-width: 600px; margin-left: auto; margin-right: auto; }
-
-    /* --- SEARCH & LUCKY --- */
-    .search-wrapper { position: relative; max-width: 600px; margin: 0 auto 1.5rem; display: flex; gap: 0.5rem; flex-direction: column; }
-    @media (min-width: 600px) { .search-wrapper { flex-direction: row; } }
+    .option-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    .option-btn:active { transform: scale(0.98); }
+    .option-correct { background-color: #dcfce7 !important; border-color: #22c55e !important; color: #15803d !important; }
+    .option-wrong { background-color: #fee2e2 !important; border-color: #ef4444 !important; color: #b91c1c !important; }
     
-    .search-input-box { position: relative; flex: 1; }
-    .search-input { width: 100%; padding: 1.2rem 1.5rem; padding-right: 3.5rem; border-radius: 99px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); font-size: 1.1rem; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5); outline: none; transition: all 0.2s; }
-    .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-glow); }
-    
-    .search-btn-icon { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 42px; height: 42px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; transition: 0.2s; }
-    .search-btn-icon:hover { transform: translateY(-50%) scale(1.05); }
-
-    .lucky-btn { 
-      padding: 0 1.5rem; height: 58px; border-radius: 99px; 
-      background: var(--bg-card); border: 1px solid var(--border-color); 
-      color: var(--text-muted); font-weight: 600; cursor: pointer; 
-      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-      transition: 0.2s; white-space: nowrap;
-    }
-    .lucky-btn:hover { border-color: var(--secondary); color: var(--secondary); background: rgba(99, 102, 241, 0.05); }
-    .lucky-icon { font-size: 1.2rem; }
-
-    .tags-container { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; margin-top: 1.5rem; }
-    .tag-chip { padding: 0.6rem 1.2rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 99px; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; transition: 0.2s; }
-    .tag-chip:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
-
-    /* --- BOOK OF THE DAY --- */
-    .daily-section { margin-top: 4rem; text-align: center; }
-    .daily-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--primary); font-weight: 700; margin-bottom: 1rem; display: block; }
-    
-    .daily-card { 
-      max-width: 500px; margin: 0 auto; 
-      background: linear-gradient(135deg, rgba(15,23,42,0.8), rgba(30,41,59,0.9)); 
-      border: 1px solid var(--primary); border-radius: var(--radius-l); 
-      padding: 1.5rem; display: flex; gap: 1.5rem; align-items: center;
-      box-shadow: 0 0 40px rgba(14, 165, 233, 0.15); cursor: pointer;
-      transition: transform 0.3s; text-align: left;
-    }
-    .daily-card:hover { transform: scale(1.02); }
-    
-    .daily-cover { 
-      width: 100px; height: 140px; border-radius: 12px; flex-shrink: 0;
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6); 
-      display: flex; align-items: center; justify-content: center; font-size: 2.5rem;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-    }
-    .daily-content h3 { margin: 0 0 0.5rem 0; font-size: 1.3rem; line-height: 1.2; }
-    .daily-content p { margin: 0 0 1rem 0; font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .daily-badge { background: var(--primary); color: white; padding: 0.3rem 0.8rem; border-radius: 99px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
-
-    /* --- BOOK GRID & CARDS --- */
-    .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; margin-top: 3rem; }
-    
-    .book-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-l); padding: 1.2rem; display: flex; flex-direction: column; gap: 1rem; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; }
-    .book-card:hover { transform: translateY(-8px); border-color: var(--primary); }
-
-    .card-fav-btn {
-      position: absolute; top: 1rem; right: 1rem;
-      width: 32px; height: 32px; border-radius: 50%;
-      background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
-      display: flex; align-items: center; justify-content: center;
-      color: white; font-size: 1.1rem; z-index: 10;
-      transition: 0.2s; opacity: 0; transform: translateY(-5px);
-    }
-    .book-card:hover .card-fav-btn { opacity: 1; transform: translateY(0); }
-    .card-fav-btn.active { color: var(--danger); opacity: 1; transform: translateY(0); background: rgba(255,255,255,0.9); }
-    .card-fav-btn:hover { transform: scale(1.1); }
-
-    .book-header { display: flex; gap: 1rem; }
-    .book-cover { width: 80px; height: 110px; border-radius: 12px; background: linear-gradient(135deg, #475569, #1e293b); display: flex; align-items: center; justify-content: center; font-size: 2rem; flex-shrink: 0; box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
-    
-    .book-meta { display: flex; flex-direction: column; justify-content: center; }
-    .book-title { font-weight: 700; font-size: 1.1rem; line-height: 1.3; margin: 0 0 0.3rem 0; }
-    .book-author { font-size: 0.9rem; color: var(--text-muted); }
-    .rating { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; margin-top: 0.5rem; font-weight: 600; }
-    .star { color: var(--warning); }
-    
-    .book-desc-preview { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-    
-    .book-footer { margin-top: auto; display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid var(--border-color); }
-    .price-badge { font-weight: 700; color: var(--success); font-size: 1.1rem; }
-    .action-link { font-size: 0.85rem; color: var(--primary); font-weight: 700; display: flex; align-items: center; gap: 4px; }
-
-    /* --- MODAL --- */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 200; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
-    .modal-overlay.open { display: flex; opacity: 1; }
-    .modal-card { background: var(--bg-body); width: 90%; max-width: 650px; max-height: 90vh; border-radius: var(--radius-l); border: 1px solid var(--border-color); position: relative; overflow: hidden; display: flex; flex-direction: column; transform: scale(0.95); transition: transform 0.3s; }
-    .modal-overlay.open .modal-card { transform: scale(1); }
-    
-    .modal-header-actions { position: absolute; top: 1rem; right: 1rem; z-index: 20; display: flex; gap: 0.5rem; }
-    .icon-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
-    .icon-btn:hover { background: var(--bg-body); transform: scale(1.05); }
-    .icon-btn.fav-btn.active { color: var(--danger); border-color: var(--danger); background: rgba(239, 68, 68, 0.1); }
-
-    .modal-content { padding: 2.5rem; flex: 1; overflow-y: auto; }
-
-    /* --- LUCKY ANIMATION --- */
-    .lucky-overlay { 
-      position: fixed; inset: 0; z-index: 300; 
-      background: var(--bg-body); display: none; 
-      flex-direction: column; align-items: center; justify-content: center; 
-    }
-    .lucky-overlay.active { display: flex; }
-    .book-flip { font-size: 5rem; animation: flip 0.8s infinite linear; }
-    @keyframes flip { 0% { transform: perspective(600px) rotateY(0deg); } 100% { transform: perspective(600px) rotateY(360deg); } }
-
-    /* --- COMPONENTS --- */
-    .tab-nav { display: flex; gap: 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
-    .tab-btn { padding: 0.5rem 0; color: var(--text-muted); font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; }
-    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
-    .tab-panel { display: none; animation: fadeIn 0.3s; }
-    .tab-panel.active { display: block; }
-
-    .feature-grid { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1.5rem; }
-    .feature-btn { font-size: 0.85rem; padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-body); color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; flex: 1; justify-content: center; min-width: 140px; }
-    .feature-btn:hover { border-color: var(--secondary); color: var(--secondary); background: rgba(99, 102, 241, 0.05); }
-
-    .ai-result-box { margin-top: 1rem; padding: 1.2rem; background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border-color); border-radius: 12px; display: none; line-height: 1.6; }
-    .ai-result-box h4 { margin-top: 0; color: var(--primary); }
-    .ai-result-box ul { padding-left: 1.2rem; margin-bottom: 0; }
-    
-    .btn-amazon { width: 100%; background: linear-gradient(to bottom right, #f59e0b, #d97706); color: #fff; font-weight: 700; padding: 1rem; border-radius: 12px; margin-top: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 0.6rem; transition: transform 0.2s; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
-    .btn-amazon:hover { transform: translateY(-2px); }
-
-    /* Chat */
-    .chat-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; height: 250px; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1rem; }
-    .chat-message { padding: 0.8rem 1rem; border-radius: 12px; font-size: 0.9rem; max-width: 85%; }
-    .chat-message.user { align-self: flex-end; background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.3); }
-    .chat-message.ai { align-self: flex-start; background: var(--bg-body); border: 1px solid var(--border-color); color: var(--text-muted); }
-    .chat-input { width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 99px; padding: 0.7rem 1.2rem; color: var(--text-main); outline: none; }
-    .chat-input:focus { border-color: var(--primary); }
-
-    /* Loader */
-    .skeleton { background: linear-gradient(90deg, var(--bg-card) 25%, var(--border-color) 50%, var(--bg-card) 75%); background-size: 200% 100%; animation: loading 1.5s infinite; border-radius: 8px; }
-    @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-    .loader-spinner { border: 3px solid rgba(255,255,255,0.1); border-left-color: var(--primary); border-radius: 50%; width: 32px; height: 32px; animation: spin 1s linear infinite; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-    /* Toast Notification */
-    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--surface); border: 1px solid var(--border-color); padding: 0.8rem 1.5rem; border-radius: 99px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 0.8rem; opacity: 0; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000; background: #0f172a; color: white; border: 1px solid #334155; }
-    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    /* Book Card Specifics */
+    .book-cover-shadow { box-shadow: 0 8px 20px -5px rgba(0,0,0,0.3); }
   </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-indigo-100 selection:text-indigo-700 font-sans flex flex-col min-h-screen bg-noise">
 
   <!-- HEADER -->
-  <nav class="navbar">
-    <div class="container nav-content">
-      <div class="brand" onclick="app.router('home')">
-        <div class="brand-icon">AI</div>
-        <div class="brand-text">Libr<span>AI</span></div>
+  <header class="fixed top-0 left-0 right-0 z-50 glass-dark h-16 transition-all duration-300 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
+      
+      <!-- Logo -->
+      <div class="flex items-center gap-2 group cursor-pointer" onclick="location.reload()">
+        <div class="bg-gradient-to-br from-indigo-500 to-violet-600 p-1.5 rounded-lg group-hover:rotate-12 transition-transform duration-300 shadow-lg shadow-indigo-500/30">
+          <i data-lucide="book-open" class="text-white w-5 h-5"></i>
+        </div>
+        <span class="font-display font-bold text-xl text-white tracking-tight">LibrAI</span>
       </div>
       
-      <div class="nav-actions">
-        <button class="nav-btn" onclick="app.router('favorites')" title="I miei libri">
-          ♥
-          <span class="nav-badge" id="fav-badge">0</span>
+      <!-- Desktop Nav -->
+      <nav class="hidden md:flex items-center gap-8">
+        <button onclick="setMode('content')" class="text-sm font-medium text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-brand-fiction shadow-[0_0_8px_#8b5cf6]"></span> Vetrina
         </button>
-        <button class="nav-btn" onclick="app.toggleTheme()" title="Cambia tema">
-          ☀
+        <button onclick="setMode('ai')" class="text-sm font-medium text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-brand-ai shadow-[0_0_8px_#3b82f6]"></span> Assistente
         </button>
-      </div>
-    </div>
-  </nav>
+        <button onclick="setMode('quiz')" class="text-sm font-medium text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-brand-nonfic shadow-[0_0_8px_#f59e0b]"></span> Quiz
+        </button>
+      </nav>
 
-  <main class="container">
-    
-    <!-- VIEW: HOME -->
-    <section id="view-home" class="view active">
-      <div class="hero">
-        <h1>Trova il libro perfetto con <span class="gradient-text">LibrAI</span></h1>
-        <p>L'intelligenza artificiale che legge, analizza e confronta i prezzi per te. Inserisci un argomento o un titolo.</p>
+      <!-- Mobile Toggle -->
+      <button onclick="toggleMenu()" class="md:hidden text-white p-2 hover:bg-white/10 rounded-lg transition-colors">
+        <i data-lucide="menu" class="w-6 h-6"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- MOBILE MENU -->
+  <div id="mobileMenu" class="fixed inset-0 z-[60] pointer-events-none opacity-0 transition-opacity duration-300">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="toggleMenu()"></div>
+    <div id="mobilePanel" class="absolute right-0 top-0 bottom-0 w-80 bg-white shadow-2xl translate-x-full transition-transform duration-300 ease-out p-6 flex flex-col gap-6 pointer-events-auto">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+            <span class="font-display font-bold text-lg text-slate-900">Menu</span>
+            <button onclick="toggleMenu()" class="p-2 bg-slate-100 rounded-full text-slate-500"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <div class="flex flex-col gap-4">
+            <button onclick="setMode('content'); toggleMenu()" class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-violet-50 transition-colors font-medium text-slate-700"><span class="w-2 h-2 rounded-full bg-brand-fiction"></span> Vetrina</button>
+            <button onclick="setMode('ai'); toggleMenu()" class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-blue-50 transition-colors font-medium text-slate-700"><span class="w-2 h-2 rounded-full bg-brand-ai"></span> Assistente</button>
+            <button onclick="setMode('quiz'); toggleMenu()" class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-amber-50 transition-colors font-medium text-slate-700"><span class="w-2 h-2 rounded-full bg-brand-nonfic"></span> Quiz</button>
+        </div>
+    </div>
+  </div>
+
+  <!-- HERO SECTION -->
+  <section class="relative pt-32 pb-20 px-4 min-h-[60vh] flex flex-col justify-center items-center text-center overflow-hidden">
+    <!-- Background (Random Image) -->
+    <div class="absolute inset-0 z-0">
+      <img id="hero-bg" src="https://images.unsplash.com/photo-1507842217121-ad663db1a9a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" alt="Library Background" class="w-full h-full object-cover transition-opacity duration-1000 ease-in-out">
+      <div class="absolute inset-0 bg-gradient-to-b from-slate-900/90 via-slate-900/70 to-slate-50"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="relative z-10 w-full max-w-3xl mx-auto">
+      <span class="inline-block py-1 px-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-indigo-100 text-xs font-bold uppercase tracking-wider mb-6 animate-fade-up">
+        Il tuo compagno di lettura
+      </span>
+      <h1 id="heroTitle" class="font-display font-extrabold text-4xl md:text-6xl text-white mb-6 leading-tight animate-fade-up [animation-delay:100ms] drop-shadow-2xl">
+        La tua prossima avventura inizia qui.
+      </h1>
+      <p class="text-slate-200 text-lg md:text-xl max-w-xl mx-auto mb-10 animate-fade-up [animation-delay:200ms] drop-shadow-lg">
+        Esplora classici, scopri nuove uscite o lascia che il sistema trovi il libro perfetto per il tuo mood.
+      </p>
+
+      <!-- ENGINE BOX -->
+      <div class="glass rounded-3xl p-2 md:p-6 shadow-2xl animate-fade-up [animation-delay:300ms]">
         
-        <div class="search-wrapper">
-          <div class="search-input-box">
-            <input type="text" class="search-input" id="mainSearchInput" placeholder="Es. 'Romanzi gialli psicologici' o 'Marketing'..." />
-            <button class="search-btn-icon" onclick="app.handleSearch()">
-              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-          </div>
-          <button class="lucky-btn" onclick="app.imFeelingLucky()">
-            <span class="lucky-icon">🍀</span> Mi sento fortunato
+        <!-- Tabs -->
+        <div class="flex gap-2 mb-6 overflow-x-auto no-scrollbar p-1 md:justify-center justify-start w-full">
+          <button onclick="setMode('content')" class="tab-btn active flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all whitespace-nowrap bg-white shadow-md text-slate-900" data-target="content">
+            <i data-lucide="library" class="w-4 h-4"></i> Vetrina
+          </button>
+          <button onclick="setMode('ai')" class="tab-btn flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all whitespace-nowrap text-slate-600 hover:bg-white/50" data-target="ai">
+            <i data-lucide="sparkles" class="w-4 h-4"></i> Assistente
+          </button>
+          <button onclick="setMode('quiz')" class="tab-btn flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all whitespace-nowrap text-slate-600 hover:bg-white/50" data-target="quiz">
+            <i data-lucide="brain-circuit" class="w-4 h-4"></i> Quiz
           </button>
         </div>
 
-        <div class="tags-container">
-          <button class="tag-chip" onclick="app.searchTag('Business & Startup')">💼 Business</button>
-          <button class="tag-chip" onclick="app.searchTag('Psicologia Cognitiva')">🧠 Psicologia</button>
-          <button class="tag-chip" onclick="app.searchTag('Thriller Nordici')">❄️ Thriller</button>
-          <button class="tag-chip" onclick="app.searchTag('Futuro e AI')">🚀 Futuro</button>
+        <!-- SEARCH CONTAINER -->
+        <div class="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-slate-100 text-left w-full">
+          
+          <!-- Content Form (Vetrina) -->
+          <div id="inputs-content" class="grid grid-cols-1 md:grid-cols-12 gap-4">
+            <div class="md:col-span-9 space-y-2">
+              <label class="text-xs font-bold text-slate-400 uppercase ml-1">Cerca un titolo o autore</label>
+              <div class="relative">
+                <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5"></i>
+                <input type="text" id="contentDestInput" class="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all" placeholder="Es. Harry Potter, Calvino...">
+              </div>
+            </div>
+            <div class="md:col-span-3 flex items-end">
+              <button onclick="doSearch()" class="w-full py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20">Cerca</button>
+            </div>
+          </div>
+
+          <!-- AI Form -->
+          <form id="searchForm" onsubmit="handleAiSearch(event)" class="hidden grid grid-cols-1 md:grid-cols-12 gap-4">
+            <div class="md:col-span-12 space-y-2">
+              <label class="text-xs font-bold text-slate-400 uppercase ml-1">Descrivi cosa cerchi</label>
+              <div class="relative">
+                <i data-lucide="message-square" class="absolute left-4 top-1/2 -translate-y-1/2 text-violet-400 w-5 h-5"></i>
+                <input id="aiDestInput" class="w-full pl-12 pr-4 py-4 bg-slate-50 border border-violet-100 rounded-xl font-medium focus:ring-2 focus:ring-violet-500 focus:border-transparent outline-none transition-all" placeholder="Es. 'Un thriller psicologico ambientato a Londra negli anni 80'..." required>
+              </div>
+            </div>
+            <div class="md:col-span-6 space-y-2">
+              <label class="text-xs font-bold text-slate-400 uppercase ml-1">Genere</label>
+              <select id="aiGenre" class="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl font-medium outline-none focus:border-violet-500 appearance-none">
+                <option value="Qualsiasi">Qualsiasi</option>
+                <option value="Romanzo">Romanzo</option>
+                <option value="Saggistica">Saggistica</option>
+                <option value="Fantasy">Fantasy</option>
+                <option value="Thriller">Thriller</option>
+                <option value="Sci-Fi">Sci-Fi</option>
+              </select>
+            </div>
+            <div class="md:col-span-6 flex items-end">
+              <button type="submit" class="w-full py-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold rounded-xl hover:shadow-lg hover:shadow-indigo-500/30 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"><i data-lucide="sparkles" class="w-5 h-5"></i> Chiedi all'Assistente</button>
+            </div>
+          </form>
+          
+          <!-- Quiz Form -->
+          <div id="inputs-quiz" class="hidden grid grid-cols-1 text-center py-6 animate-fade-up">
+            <h3 class="text-lg font-bold text-slate-800 mb-2">Quanto ne sai di letteratura? 📚</h3>
+            <p class="text-sm text-slate-500 mb-6">Mettiti alla prova con domande dinamiche.</p>
+            <button onclick="startQuiz()" class="mx-auto px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-full shadow-lg shadow-orange-500/30 hover:scale-105 transition-transform flex items-center gap-2"><i data-lucide="play-circle" class="w-5 h-5"></i> Inizia Quiz</button>
+            <div class="mt-4">
+                <button onclick="generateAIQuiz()" class="text-xs font-bold text-slate-400 hover:text-orange-500 flex items-center justify-center gap-1 mx-auto transition-colors"><i data-lucide="refresh-cw" class="w-3 h-3"></i> Genera nuove domande</button>
+            </div>
+          </div>
+
         </div>
       </div>
+    </div>
+  </section>
 
-      <!-- LIBRO DEL GIORNO -->
-      <div class="daily-section">
-        <span class="daily-label">✨ Libro del Giorno</span>
-        <div id="daily-container">
-          <!-- Iniettato via JS -->
+  <!-- DAILY BOOK SECTION -->
+  <section class="max-w-4xl mx-auto px-4 -mt-10 relative z-20 pb-12">
+    <div class="bg-gradient-to-r from-indigo-900 to-slate-900 rounded-3xl p-1 shadow-2xl overflow-hidden animate-fade-up" style="animation-delay: 400ms">
+        <div class="bg-slate-900/50 backdrop-blur-sm rounded-[22px] p-6 md:p-8 border border-white/10 relative overflow-hidden group cursor-pointer" id="daily-container">
+            <!-- Injected via JS -->
         </div>
-      </div>
+    </div>
+  </section>
 
-      <div style="margin-top: 3rem;">
-        <h3 style="font-weight:800; margin-bottom:1rem; font-size:1.5rem;">I più richiesti oggi</h3>
-        <div class="books-grid" id="featured-grid">
-          <!-- JS Insert -->
-        </div>
-      </div>
-    </section>
-
-    <!-- VIEW: SEARCH -->
-    <section id="view-search" class="view">
-      <div style="margin-top: 2rem; display: flex; align-items: center; gap: 1rem;">
-        <button onclick="app.router('home')" style="color:var(--text-muted); font-weight:600; display:flex; align-items:center; gap:0.5rem;">← Home</button>
-      </div>
-      <h2 style="margin: 1rem 0;">Risultati per: <span class="gradient-text" id="query-display">...</span></h2>
-      <div id="loading-indicator" style="display:none; text-align:center; padding: 6rem 0;">
-        <div class="loader-spinner" style="display:inline-block; margin-bottom:1rem;"></div>
-        <p style="color:var(--text-muted);">LibrAI sta analizzando migliaia di titoli...</p>
-      </div>
-      <div class="books-grid" id="results-grid"></div>
-    </section>
-
-    <!-- VIEW: FAVORITES -->
-    <section id="view-favorites" class="view">
-      <div style="margin-top: 2rem; display: flex; align-items: center; gap: 1rem;">
-        <button onclick="app.router('home')" style="color:var(--text-muted); font-weight:600;">← Home</button>
-      </div>
-      <h2 style="margin: 1rem 0;">La mia Libreria <span style="color:var(--danger)">♥</span></h2>
-      <div id="favorites-empty" style="text-align:center; padding: 4rem 0; display:none;">
-        <div style="font-size:3rem; margin-bottom:1rem; opacity:0.5;">📚</div>
-        <p style="color:var(--text-muted);">Non hai ancora salvato nessun libro.</p>
-        <button onclick="app.router('home')" style="color:var(--primary); font-weight:700; margin-top:0.5rem;">Inizia a esplorare</button>
-      </div>
-      <div class="books-grid" id="favorites-grid"></div>
-    </section>
-
+  <!-- RESULTS GRID -->
+  <main class="max-w-7xl mx-auto px-4 pb-20 relative z-20">
+    <div class="flex items-center justify-between mb-8">
+        <h3 id="resultsTitle" class="font-display font-bold text-2xl text-slate-800">Libri in Vetrina</h3>
+        <div class="h-1 flex-grow mx-4 bg-slate-200/50 rounded-full"></div>
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Selezione Curata</span>
+    </div>
+    <div id="gridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
   </main>
 
   <!-- MODAL -->
-  <div class="modal-overlay" id="bookModal">
-    <div class="modal-card">
-      <div class="modal-header-actions">
-        <button class="icon-btn fav-btn" id="modal-fav-btn" onclick="app.toggleModalFavorite()">♥</button>
-        <button class="icon-btn" onclick="app.closeModal()">×</button>
+  <div id="aiModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeAiModal()"></div>
+    <div class="bg-white w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl shadow-2xl relative z-10 transform transition-all scale-95 opacity-0 flex flex-col" id="aiModalInner">
+      
+      <!-- Modal Header -->
+      <div class="sticky top-0 bg-white/90 backdrop-blur-md border-b border-slate-100 p-4 flex justify-between items-center z-20">
+        <div class="flex items-center gap-2 text-indigo-600"><i data-lucide="book-open" class="w-5 h-5"></i><span class="font-bold text-lg">Dettagli Libro</span></div>
+        <button onclick="closeAiModal()" class="p-2 hover:bg-slate-100 rounded-full transition-colors"><i data-lucide="x" class="w-6 h-6 text-slate-500"></i></button>
       </div>
-      <div class="modal-content" id="modal-content-area"></div>
+
+      <!-- Modal Body -->
+      <div id="aiModalBody" class="p-0 flex-1">
+        <!-- Injected Content Here -->
+      </div>
     </div>
   </div>
 
-  <!-- LUCKY ANIMATION OVERLAY -->
-  <div class="lucky-overlay" id="luckyOverlay">
-    <div class="book-flip">📖</div>
-    <h3 style="margin-top:1.5rem; color:var(--text-main);">Sto cercando il libro perfetto...</h3>
+  <!-- COOKIE BANNER -->
+  <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 md:bottom-6 md:right-6 md:left-auto md:max-w-sm z-[200] translate-y-[150%] opacity-0 transition-all duration-700 ease-out p-4 pointer-events-none">
+    <div class="bg-white/95 backdrop-blur-xl border border-slate-200 shadow-2xl rounded-2xl p-6 relative overflow-hidden pointer-events-auto">
+        <div class="flex items-start gap-4">
+            <div class="p-3 bg-indigo-50 rounded-xl text-indigo-600"><i data-lucide="cookie" class="w-6 h-6"></i></div>
+            <div>
+                <h4 class="font-bold text-slate-900 text-lg mb-1">Privacy & Cookie</h4>
+                <p class="text-sm text-slate-500 leading-relaxed mb-4">Utilizziamo i cookie per migliorare la tua esperienza di lettura.</p>
+                <div class="flex gap-3">
+                    <button onclick="acceptCookies('true')" class="flex-1 py-2 bg-slate-900 text-white text-xs font-bold rounded-lg hover:bg-slate-800">Accetta</button>
+                    <button onclick="acceptCookies('false')" class="flex-1 py-2 bg-slate-100 text-slate-600 text-xs font-bold rounded-lg hover:bg-slate-200">Rifiuta</button>
+                </div>
+            </div>
+        </div>
+    </div>
   </div>
 
-  <!-- TOAST -->
-  <div class="toast" id="toast">
-    <span style="font-size:1.2rem;">✅</span>
-    <span id="toast-msg">Libro salvato nei preferiti</span>
-  </div>
+  <!-- FOOTER -->
+  <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800 text-center mt-auto relative z-10">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex items-center justify-center gap-2 mb-4 opacity-80"><i data-lucide="book" class="w-6 h-6"></i><span class="font-display font-bold text-xl text-white">LibrAI</span></div>
+      <p class="text-sm mb-8">Il tuo assistente di lettura intelligente.</p>
+    </div>
+  </footer>
 
   <script>
-    const referralTag = "filmshokblogs-21"; 
     const apiKey = "";
-    
-    // DB Ampliato per la rotazione giornaliera
-    const FULL_DB = [
-      { id: 101, title: "Atomic Habits", author: "James Clear", tags: ["Crescita", "Abitudini"], rating: 4.8, price: 15.90, oldPrice: 22.00, color: "linear-gradient(135deg, #f59e0b, #d97706)", summary: "Il manuale definitivo per costruire buone abitudini un 1% alla volta." },
-      { id: 102, title: "L'Arte della Guerra", author: "Sun Tzu", tags: ["Strategia", "Classici"], rating: 4.6, price: 9.90, oldPrice: 12.00, color: "linear-gradient(135deg, #ef4444, #b91c1c)", summary: "Strategia pura per vincere le sfide della vita senza combattere." },
-      { id: 103, title: "Sapiens", author: "Yuval Noah Harari", tags: ["Storia", "Umanità"], rating: 4.9, price: 18.00, oldPrice: 24.00, color: "linear-gradient(135deg, #10b981, #059669)", summary: "Come siamo passati da scimmie insignificanti a padroni del mondo." },
-      { id: 104, title: "1984", author: "George Orwell", tags: ["Distopia"], rating: 4.8, price: 10.50, oldPrice: 14.00, color: "linear-gradient(135deg, #475569, #1e293b)", summary: "Il capolavoro distopico sul controllo e la perdita della libertà." },
-      { id: 105, title: "Pensieri Lenti e Veloci", author: "Daniel Kahneman", tags: ["Psicologia"], rating: 4.7, price: 16.90, oldPrice: 22.00, color: "linear-gradient(135deg, #3b82f6, #1d4ed8)", summary: "Scopri come il tuo cervello ti inganna nel prendere decisioni." },
-      { id: 106, title: "L'Arte della Vittoria", author: "Phil Knight", tags: ["Business"], rating: 4.9, price: 14.00, oldPrice: 19.00, color: "linear-gradient(135deg, #0ea5e9, #0284c7)", summary: "La folle corsa imprenditoriale dietro la creazione della Nike." },
-      { id: 107, title: "Psicologia dei Soldi", author: "Morgan Housel", tags: ["Finanza"], rating: 4.7, price: 13.50, oldPrice: 18.00, color: "linear-gradient(135deg, #14b8a6, #0f766e)", summary: "I soldi non sono fogli di calcolo, sono emozioni. Impara a gestirle." },
-      { id: 108, title: "Steve Jobs", author: "Walter Isaacson", tags: ["Biografia"], rating: 4.8, price: 19.00, oldPrice: 25.00, color: "linear-gradient(135deg, #6366f1, #4f46e5)", summary: "Il ritratto crudo di un genio che ha piegato la realtà al suo volere." },
-      { id: 109, title: "Deep Work", author: "Cal Newport", tags: ["Produttività"], rating: 4.6, price: 17.50, oldPrice: 23.00, color: "linear-gradient(135deg, #e11d48, #be123c)", summary: "Impara a concentrarti in un mondo distratto. Un superpotere moderno." },
-      { id: 110, title: "Dune", author: "Frank Herbert", tags: ["Sci-Fi"], rating: 4.9, price: 16.00, oldPrice: 22.00, color: "linear-gradient(135deg, #d97706, #92400e)", summary: "L'epopea fantascientifica definitiva su politica, religione ed ecologia." },
-      { id: 111, title: "Il Piccolo Principe", author: "A. de Saint-Exupéry", tags: ["Classici"], rating: 4.9, price: 8.00, oldPrice: 10.00, color: "linear-gradient(135deg, #fbbf24, #f59e0b)", summary: "Una fiaba per adulti che insegna a vedere col cuore." },
-      { id: 112, title: "Il Signore degli Anelli", author: "J.R.R. Tolkien", tags: ["Fantasy"], rating: 5.0, price: 25.00, oldPrice: 35.00, color: "linear-gradient(135deg, #15803d, #14532d)", summary: "Il viaggio epico che ha definito il genere fantasy moderno." }
+    const AFFILIATE_TAG = "filmshokblogs-21";
+    let currentMode = 'content'; 
+    let FULL_DB = [
+      { id: 101, title: "Atomic Habits", author: "James Clear", tags: ["Crescita"], rating: 4.8, price: 15.90, color: "linear-gradient(135deg, #f59e0b, #d97706)", summary: "Il manuale definitivo per costruire buone abitudini un 1% alla volta." },
+      { id: 102, title: "L'Arte della Guerra", author: "Sun Tzu", tags: ["Strategia"], rating: 4.6, price: 9.90, color: "linear-gradient(135deg, #ef4444, #b91c1c)", summary: "Strategia pura per vincere le sfide della vita senza combattere." },
+      { id: 103, title: "Sapiens", author: "Yuval Noah Harari", tags: ["Storia"], rating: 4.9, price: 18.00, color: "linear-gradient(135deg, #10b981, #059669)", summary: "Come siamo passati da scimmie insignificanti a padroni del mondo." },
+      { id: 104, title: "1984", author: "George Orwell", tags: ["Distopia"], rating: 4.8, price: 10.50, color: "linear-gradient(135deg, #475569, #1e293b)", summary: "Il capolavoro distopico sul controllo e la perdita della libertà." },
+      { id: 105, title: "Pensieri Lenti e Veloci", author: "Daniel Kahneman", tags: ["Psicologia"], rating: 4.7, price: 16.90, color: "linear-gradient(135deg, #3b82f6, #1d4ed8)", summary: "Scopri come il tuo cervello ti inganna nel prendere decisioni." },
+      { id: 106, title: "Il Signore degli Anelli", author: "J.R.R. Tolkien", tags: ["Fantasy"], rating: 5.0, price: 25.00, color: "linear-gradient(135deg, #16a34a, #14532d)", summary: "L'epopea fantasy che ha definito un genere. Un viaggio indimenticabile." },
+      { id: 107, title: "Dune", author: "Frank Herbert", tags: ["Sci-Fi"], rating: 4.9, price: 14.50, color: "linear-gradient(135deg, #d97706, #92400e)", summary: "Politica, religione ed ecologia si intrecciano nel deserto di Arrakis." },
+      { id: 108, title: "Il Piccolo Principe", author: "A. de Saint-Exupéry", tags: ["Classici"], rating: 4.9, price: 8.50, color: "linear-gradient(135deg, #fbbf24, #f59e0b)", summary: "Una fiaba per adulti che insegna a vedere col cuore." },
+      { id: 109, title: "Orgoglio e Pregiudizio", author: "Jane Austen", tags: ["Romanzo"], rating: 4.8, price: 11.00, color: "linear-gradient(135deg, #f472b6, #db2777)", summary: "Amore, classe sociale e arguzia nell'Inghilterra dell'Ottocento." },
+      { id: 110, title: "Shining", author: "Stephen King", tags: ["Horror"], rating: 4.7, price: 13.00, color: "linear-gradient(135deg, #991b1b, #7f1d1d)", summary: "L'hotel Overlook nasconde orrori che metteranno alla prova la sanità mentale." },
+      { id: 111, title: "Steve Jobs", author: "Walter Isaacson", tags: ["Biografia"], rating: 4.8, price: 19.00, color: "linear-gradient(135deg, #64748b, #334155)", summary: "La vita intensa e controversa del genio che ha cambiato la tecnologia." },
+      { id: 112, title: "Gomorra", author: "Roberto Saviano", tags: ["Attualità"], rating: 4.6, price: 12.50, color: "linear-gradient(135deg, #1e293b, #0f172a)", summary: "Un viaggio crudo e reale nel mondo della criminalità organizzata." }
+    ];
+    let QUIZ_QUESTIONS = [
+       { q: "Chi ha scritto 'Il Nome della Rosa'?", options: ["Umberto Eco", "Italo Calvino", "Dante", "Manzoni"], ans: 0 },
+       { q: "Qual è il vero nome di Don Chisciotte?", options: ["Alonso Quijano", "Sancho Panza", "Miguel de Cervantes", "El Cid"], ans: 0 },
+       { q: "In che anno è ambientato '1984'?", options: ["1984", "2024", "1948", "2084"], ans: 0 }
+    ];
+    let currentQuizIdx = 0, quizScore = 0;
+    let CURRENT_ACTIVE_BOOK = null;
+
+    // HERO IMAGES ARRAY
+    const HERO_IMAGES = [
+      "https://images.unsplash.com/photo-1507842217121-ad663db1a9a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80",
+      "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80",
+      "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80",
+      "https://images.unsplash.com/photo-1512820790803-83ca734da794?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80",
+      "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
     ];
 
-    let CURRENT_RESULTS = [];
-    let CURRENT_ACTIVE_BOOK = null;
-    let FAVORITES = [];
-
-    const app = {
-      state: { theme: 'dark' },
-
-      init() {
-        const savedTheme = localStorage.getItem('librai_theme') || 'dark';
-        this.setTheme(savedTheme);
-        this.loadFavorites();
-
-        // 1. Calcola il "Seme" Giornaliero
-        const seed = this.getDailySeed();
-        
-        // 2. Mescola il DB in modo deterministico basato sulla data
-        const shuffledDB = this.shuffleArrayWithSeed([...FULL_DB], seed);
-        
-        // 3. Seleziona Libro del Giorno (il primo) e Featured (i successivi 6)
-        const dailyBook = shuffledDB[0];
-        const featuredBooks = shuffledDB.slice(1, 7);
-
-        this.renderDailyBook(dailyBook);
-        this.renderCards(featuredBooks, 'featured-grid');
-
-        // Events
-        document.getElementById('mainSearchInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') this.handleSearch(); });
-        document.getElementById('bookModal').onclick = (e) => { if (e.target.id === 'bookModal') this.closeModal(); }
-      },
-
-      /* --- DAILY LOGIC --- */
-      getDailySeed() {
-        // Crea un numero unico basato sulla data (YYYYMMDD)
-        const today = new Date();
-        const str = `${today.getFullYear()}${today.getMonth() + 1}${today.getDate()}`;
-        return parseInt(str);
-      },
-
-      shuffleArrayWithSeed(array, seed) {
-        // Algoritmo di shuffle deterministico
-        let m = array.length, t, i;
-        while (m) {
-          // Generatore pseudo-random
-          seed = (seed * 9301 + 49297) % 233280;
-          let random = seed / 233280;
-          
-          i = Math.floor(random * m--);
-          t = array[m];
-          array[m] = array[i];
-          array[i] = t;
+    // INIT
+    window.onload = function() {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        setMode('content');
+        if (!localStorage.getItem('cookieConsent')) {
+            setTimeout(() => document.getElementById('cookie-banner').classList.remove('translate-y-[150%]', 'opacity-0'), 1000);
         }
-        return array;
-      },
-
-      renderDailyBook(book) {
-        const container = document.getElementById('daily-container');
-        const bookStr = JSON.stringify(book).replace(/'/g, "&#39;").replace(/"/g, '&quot;');
         
-        container.innerHTML = `
-          <div class="daily-card" onclick='app.openModalFromObj(${bookStr})'>
-            <div class="daily-cover" style="background:${book.color}">📖</div>
-            <div class="daily-content">
-              <h3>${book.title}</h3>
-              <p>${book.author}</p>
-              <p>${book.summary}</p>
-              <span class="daily-badge">Consigliato oggi</span>
-            </div>
-          </div>
-        `;
-      },
+        // Pick Daily Book (Deterministic based on date)
+        const daySeed = new Date().getDate();
+        const dailyIndex = daySeed % FULL_DB.length;
+        const dailyBook = FULL_DB[dailyIndex];
+        // Remove daily from grid list to avoid duplicate? No, keep it.
+        renderDailyBook(dailyBook);
 
-      /* --- LUCKY LOGIC --- */
-      imFeelingLucky() {
-        const overlay = document.getElementById('luckyOverlay');
-        overlay.classList.add('active');
-
-        // Attendi 1.5 secondi di animazione
-        setTimeout(() => {
-          overlay.classList.remove('active');
-          // Pesca un libro random dal DB completo
-          const randomBook = FULL_DB[Math.floor(Math.random() * FULL_DB.length)];
-          this.openModalFromObj(randomBook);
-        }, 1500);
-      },
-
-      /* --- FAVORITES LOGIC --- */
-      loadFavorites() {
-        const saved = localStorage.getItem('librai_favorites');
-        FAVORITES = saved ? JSON.parse(saved) : [];
-        this.updateFavBadge();
-      },
-
-      isFav(id) { return FAVORITES.some(b => b.id === id); },
-
-      toggleFavorite(book, event) {
-        if(event) event.stopPropagation(); 
-        if (this.isFav(book.id)) {
-          FAVORITES = FAVORITES.filter(b => b.id !== book.id);
-          this.showToast("Rimosso dai preferiti");
-        } else {
-          FAVORITES.push(book);
-          this.showToast("Aggiunto ai preferiti");
-        }
-        localStorage.setItem('librai_favorites', JSON.stringify(FAVORITES));
-        this.updateFavBadge();
-        // Refresh views
-        this.init(); // Refresh Home cards icons
-        if(CURRENT_RESULTS.length) this.renderCards(CURRENT_RESULTS, 'results-grid');
-        this.renderFavorites();
-      },
-
-      toggleModalFavorite() {
-        if (!CURRENT_ACTIVE_BOOK) return;
-        this.toggleFavorite(CURRENT_ACTIVE_BOOK);
-        const btn = document.getElementById('modal-fav-btn');
-        if (this.isFav(CURRENT_ACTIVE_BOOK.id)) btn.classList.add('active');
-        else btn.classList.remove('active');
-      },
-
-      updateFavBadge() {
-        const badge = document.getElementById('fav-badge');
-        badge.textContent = FAVORITES.length;
-        badge.style.display = FAVORITES.length > 0 ? 'block' : 'none';
-      },
-
-      renderFavorites() {
-        const grid = document.getElementById('favorites-grid');
-        const empty = document.getElementById('favorites-empty');
-        if (FAVORITES.length === 0) {
-          grid.innerHTML = '';
-          empty.style.display = 'block';
-        } else {
-          empty.style.display = 'none';
-          this.renderCards(FAVORITES, 'favorites-grid');
-        }
-      },
-
-      showToast(msg) {
-        const toast = document.getElementById('toast');
-        document.getElementById('toast-msg').textContent = msg;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2000);
-      },
-
-      /* --- ROUTER --- */
-      router(viewName) {
-        document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-        document.getElementById('view-' + viewName).classList.add('active');
-        window.scrollTo(0,0);
-        if (viewName === 'favorites') this.renderFavorites();
-      },
-
-      /* --- SEARCH --- */
-      async handleSearch() {
-        const query = document.getElementById('mainSearchInput').value.trim();
-        if (!query) return;
-        this.searchTag(query);
-      },
-
-      async searchTag(query) {
-        document.getElementById('mainSearchInput').value = query;
-        document.getElementById('query-display').textContent = query;
-        
-        const grid = document.getElementById('results-grid');
-        const loader = document.getElementById('loading-indicator');
-        grid.innerHTML = '';
-        loader.style.display = 'block';
-        this.router('search');
-
-        try {
-          const results = await this.fetchBooksFromBackend(query);
-          loader.style.display = 'none';
-          if (results && results.length > 0) {
-            CURRENT_RESULTS = results;
-            this.renderCards(results, 'results-grid');
-          } else {
-            grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-muted);">Nessun risultato trovato.</div>`;
-          }
-        } catch (error) {
-          loader.style.display = 'none';
-          grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--danger);">Errore AI. Riprova.</div>`;
-        }
-      },
-
-      async fetchBooksFromBackend(userQuery) {
-        // PROMPT ANTI-SPOILER
-        const prompt = `Sei LibrAI. L'utente cerca: "${userQuery}". Genera JSON con 6 libri.
-        IMPORTANTE: Non fare mai spoiler sul finale o sui colpi di scena.
-        Struttura array oggetti: {id (numero), title, author, tags[], rating (float), price (float), oldPrice, summary (string), color (css gradient)}. Rispondi solo JSON.`;
-        
-        try {
-          // Direct API call
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-          const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-          });
-          
-          if (!res.ok) throw new Error("Errore API Gemini");
-
-          const data = await res.json();
-          let text = data.candidates[0].content.parts[0].text;
-          text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-          return JSON.parse(text);
-        } catch (e) {
-          console.error(e);
-          return [];
-        }
-      },
-
-      /* --- RENDER --- */
-      renderCards(books, containerId) {
-        const container = document.getElementById(containerId);
-        container.innerHTML = books.map(book => {
-          const bookStr = JSON.stringify(book).replace(/'/g, "&#39;").replace(/"/g, '&quot;');
-          const isFav = this.isFav(book.id);
-          return `
-          <div class="book-card" onclick='app.openModalFromObj(${bookStr})'>
-            <button class="card-fav-btn ${isFav ? 'active' : ''}" onclick='app.toggleFavorite(${bookStr}, event)'>♥</button>
-            <div class="book-header">
-              <div class="book-cover" style="background:${book.color}">📖</div>
-              <div class="book-meta">
-                <h3 class="book-title">${book.title}</h3>
-                <div class="book-author">${book.author}</div>
-                <div class="rating"><span class="star">★</span> ${book.rating}</div>
-              </div>
-            </div>
-            <p class="book-desc-preview">${book.summary}</p>
-            <div class="book-footer">
-              <div class="price-badge">${book.price.toFixed(2)}€</div>
-              <div class="action-link">Riassunto →</div>
-            </div>
-          </div>
-        `}).join('');
-      },
-
-      openModalFromObj(book) {
-        CURRENT_ACTIVE_BOOK = book;
-        const modal = document.getElementById('bookModal');
-        const content = document.getElementById('modal-content-area');
-        const favBtn = document.getElementById('modal-fav-btn');
-        
-        if(this.isFav(book.id)) favBtn.classList.add('active');
-        else favBtn.classList.remove('active');
-
-        modal.classList.add('open');
-        document.body.style.overflow = 'hidden';
-
-        content.innerHTML = `<div class="skeleton" style="height:200px; width:100%; border-radius:12px;"></div>`;
-
-        const cleanTitle = book.title.replace(/[^\w\s]/gi, ''); 
-        const link = `https://www.amazon.it/s?k=${encodeURIComponent(cleanTitle + ' ' + book.author)}&tag=${referralTag}`;
-
-        setTimeout(() => {
-          content.innerHTML = `
-            <div style="display:flex; flex-wrap:wrap; gap:1.5rem; margin-bottom:1.5rem;">
-              <div style="width:100px; height:140px; border-radius:12px; background:${book.color}; display:flex; align-items:center; justify-content:center; font-size:2.5rem;">📖</div>
-              <div style="flex:1;">
-                <div class="ai-badge">✨ LibrAI Analysis</div>
-                <h1 style="margin:0 0 0.5rem 0; line-height:1.2;">${book.title}</h1>
-                <p style="color:var(--text-muted);">di ${book.author}</p>
-                <div style="margin-top:0.5rem;"><span style="font-size:1.4rem; font-weight:700; color:var(--success);">${book.price.toFixed(2)}€</span></div>
-              </div>
-            </div>
-
-            <div class="tab-nav">
-              <div class="tab-btn active" onclick="app.switchTab('overview', this)">Panoramica</div>
-              <div class="tab-btn" onclick="app.switchTab('chat', this)">Chiedi al Libro</div>
-            </div>
-
-            <div id="tab-overview" class="tab-panel active">
-              <div style="background:var(--bg-card); border:1px solid var(--primary); padding:1.5rem; border-radius:16px;">
-                <p style="line-height:1.6; margin-top:0;">${book.summary}</p>
-                <div class="feature-grid">
-                  <button class="feature-btn" onclick="app.generateContent(this, 'quotes')">📜 Citazioni</button>
-                  <button class="feature-btn" onclick="app.generateContent(this, 'pros')">⚖️ Pro & Contro</button>
-                  <button class="feature-btn" onclick="app.generateContent(this, 'plan')">📅 Piano Lettura</button>
-                </div>
-                <div class="ai-result-box" id="ai-result"></div>
-              </div>
-              <a href="${link}" target="_blank" class="btn-amazon">Acquista su Amazon.it</a>
-            </div>
-
-            <div id="tab-chat" class="tab-panel">
-               <div class="chat-box" id="chat-box-area">
-                 <div class="chat-message ai">Ciao! Chiedimi qualsiasi cosa su "${book.title}".</div>
-               </div>
-               <div style="display:flex; gap:0.5rem;">
-                 <input type="text" id="chat-input" class="chat-input" placeholder="Scrivi..." onkeypress="if(event.key === 'Enter') app.sendChat()">
-                 <button class="chat-send-btn" onclick="app.sendChat()" style="background:var(--primary); color:white; width:40px; height:40px; border-radius:50%;">➤</button>
-               </div>
-            </div>
-          `;
-        }, 150);
-      },
-
-      closeModal() {
-        document.getElementById('bookModal').classList.remove('open');
-        document.body.style.overflow = '';
-      },
-
-      switchTab(name, btn) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-        document.getElementById(`tab-${name}`).classList.add('active');
-      },
-
-      async generateContent(btn, type) {
-        const prompts = {
-          quotes: `Estrai 3 citazioni brevi da "${CURRENT_ACTIVE_BOOK.title}". No spoiler.`,
-          pros: `3 Pro e 3 Contro del libro "${CURRENT_ACTIVE_BOOK.title}". No spoiler. Format HTML list.`,
-          plan: `Piano lettura 5 giorni per "${CURRENT_ACTIVE_BOOK.title}". No spoiler. Format HTML list.`
-        };
-        const orig = btn.innerText;
-        btn.innerText = "Caricamento..."; btn.disabled = true;
-        
-        try {
-          // Direct API call
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-          const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: prompts[type] }] }] })
-          });
-          const data = await res.json();
-          const text = data.candidates[0].content.parts[0].text.replace(/```html/g,'').replace(/```/g,'');
-          
-          const box = document.getElementById('ai-result');
-          box.innerHTML = text.replace(/\n/g, '<br>');
-          box.style.display = 'block';
-        } catch(e) { console.error(e); }
-        btn.innerText = orig; btn.disabled = false;
-      },
-
-      async sendChat() {
-        const input = document.getElementById('chat-input');
-        const box = document.getElementById('chat-box-area');
-        const msg = input.value.trim();
-        if(!msg) return;
-
-        box.innerHTML += `<div class="chat-message user">${msg}</div>`;
-        input.value = '';
-        box.scrollTop = box.scrollHeight;
-
-        try {
-          // Direct API call
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-          const res = await fetch(url, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ contents: [{ parts: [{ text: `Esperto libro "${CURRENT_ACTIVE_BOOK.title}". User: "${msg}". Risposta breve italiano. NON FARE SPOILER SUL FINALE.` }] }] })
-          });
-          const data = await res.json();
-          const text = data.candidates[0].content.parts[0].text;
-          box.innerHTML += `<div class="chat-message ai">${text}</div>`;
-        } catch(e) {
-          box.innerHTML += `<div class="chat-message ai">Errore connessione.</div>`;
-        }
-        box.scrollTop = box.scrollHeight;
-      },
-
-      toggleTheme() {
-        const newTheme = this.state.theme === 'dark' ? 'light' : 'dark';
-        this.setTheme(newTheme);
-      },
-      setTheme(t) {
-        this.state.theme = t;
-        document.documentElement.setAttribute('data-theme', t);
-        localStorage.setItem('librai_theme', t);
-      }
+        // Set Random Hero Image
+        setRandomHeroImage();
     };
 
-    app.init();
+    function setRandomHeroImage() {
+      const img = document.getElementById('hero-bg');
+      if (img) {
+        const randomUrl = HERO_IMAGES[Math.floor(Math.random() * HERO_IMAGES.length)];
+        img.src = randomUrl;
+      }
+    }
+
+    function acceptCookies(val) {
+        localStorage.setItem('cookieConsent', val);
+        document.getElementById('cookie-banner').classList.add('translate-y-[150%]', 'opacity-0');
+    }
+
+    function toggleMenu() {
+        const menu = document.getElementById('mobileMenu');
+        const panel = document.getElementById('mobilePanel');
+        const isOpen = menu.style.pointerEvents === 'auto';
+        if (isOpen) {
+            menu.style.opacity = '0'; menu.style.pointerEvents = 'none'; panel.style.transform = 'translateX(100%)';
+        } else {
+            menu.style.opacity = '1'; menu.style.pointerEvents = 'auto'; panel.style.transform = 'translateX(0)';
+        }
+    }
+
+    function setMode(mode) {
+        currentMode = mode;
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('bg-white', 'shadow-md', 'text-slate-900');
+            btn.classList.add('text-slate-600', 'hover:bg-white/50');
+            if(btn.dataset.target === mode) {
+                btn.classList.remove('text-slate-600', 'hover:bg-white/50');
+                btn.classList.add('bg-white', 'shadow-md', 'text-slate-900');
+            }
+        });
+
+        ['searchForm','inputs-quiz','inputs-content'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.classList.add('hidden');
+        });
+        
+        const titles = { content: "Vetrina Libri", ai: "Suggerimenti per te", quiz: "Quiz Letterario" };
+        document.getElementById('resultsTitle').innerText = titles[mode];
+        const heroTitle = document.getElementById('heroTitle');
+
+        if(mode === 'content') {
+            document.getElementById('inputs-content').classList.remove('hidden');
+            heroTitle.innerHTML = 'La tua prossima lettura.';
+            renderGrid(FULL_DB, "");
+        } else if(mode === 'ai') {
+            document.getElementById('searchForm').classList.remove('hidden');
+            heroTitle.innerHTML = 'Il tuo Assistente Personale.';
+            renderEmptyState("Descrivi i tuoi gusti e il sistema troverà il libro perfetto.");
+        } else if(mode === 'quiz') {
+            document.getElementById('inputs-quiz').classList.remove('hidden');
+            heroTitle.innerHTML = 'Sfida la tua cultura.';
+            startQuiz();
+        }
+        if (window.lucide) lucide.createIcons();
+    }
+
+    function renderEmptyState(msg) {
+        document.getElementById('gridContainer').innerHTML = `<div class="col-span-full py-12 text-center text-slate-400 bg-white rounded-3xl border border-dashed border-slate-200"><i data-lucide="sparkles" class="w-12 h-12 mx-auto mb-4 text-slate-200"></i><p>${msg}</p></div>`;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function showSkeleton() {
+        const grid = document.getElementById('gridContainer');
+        grid.innerHTML = Array(3).fill(0).map(() => `<div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm h-80 flex flex-col gap-4"><div class="h-40 w-full rounded-xl skeleton"></div><div class="h-4 w-full rounded-full skeleton"></div></div>`).join('');
+    }
+
+    function doSearch() {
+        const query = document.getElementById('contentDestInput').value.toLowerCase();
+        const results = FULL_DB.filter(b => b.title.toLowerCase().includes(query) || b.author.toLowerCase().includes(query));
+        renderGrid(results, query);
+    }
+
+    function renderDailyBook(book) {
+        const container = document.getElementById('daily-container');
+        const bookStr = JSON.stringify(book).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+        
+        container.innerHTML = `
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500 rounded-full blur-[60px] opacity-40"></div>
+            <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-violet-500 rounded-full blur-[60px] opacity-40"></div>
+            
+            <div class="relative z-10 flex flex-col md:flex-row items-center gap-6 md:gap-10" onclick='openBookModal(${bookStr})'>
+                <div class="w-32 h-44 md:w-40 md:h-56 rounded-xl shadow-2xl flex items-center justify-center text-5xl flex-shrink-0 transform md:-rotate-6 transition-transform group-hover:rotate-0 duration-500" style="background:${book.color}">
+                    📖
+                </div>
+                <div class="text-center md:text-left text-white">
+                    <span class="inline-block py-1 px-3 rounded-full bg-amber-400/20 border border-amber-400/50 text-amber-300 text-[10px] font-bold uppercase tracking-wider mb-4 shadow-sm backdrop-blur-sm">
+                        ✨ Libro consigliato del giorno
+                    </span>
+                    <h2 class="font-display font-bold text-2xl md:text-4xl mb-2 leading-tight">${book.title}</h2>
+                    <p class="text-indigo-200 text-lg mb-4 font-medium">${book.author}</p>
+                    <p class="text-slate-300 text-sm md:text-base leading-relaxed max-w-lg mb-6 line-clamp-2 md:line-clamp-3">${book.summary}</p>
+                    <button class="bg-white text-slate-900 px-6 py-3 rounded-xl font-bold text-sm hover:bg-indigo-50 transition-colors shadow-lg shadow-white/10 flex items-center gap-2 mx-auto md:mx-0">
+                        Scopri di più <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    // --- AI SEARCH ---
+    async function handleAiSearch(e) {
+        e.preventDefault();
+        showSkeleton();
+        const query = document.getElementById('aiDestInput').value;
+        const genre = document.getElementById('aiGenre').value;
+        
+        // BACKEND CALL (Switch to '/api/generate' for Vercel)
+        const prompt = `Sei un libraio esperto. L'utente cerca: "${query}" (Genere: ${genre}). Genera un JSON array con 6 libri REALI consigliati. 
+        Struttura oggetto: { "id": numero, "title": "Titolo", "author": "Autore", "summary": "Breve frase motivazionale", "rating": 4.5, "price": 15.00, "color": "linear-gradient(...)" }. 
+        Rispondi SOLO JSON.`;
+
+        try {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+            });
+            const data = await res.json();
+            let text = data.candidates[0].content.parts[0].text.replace(/```json/g,'').replace(/```/g,'').trim();
+            const books = JSON.parse(text);
+            renderGrid(books, query);
+        } catch(err) {
+            console.error(err);
+            renderEmptyState("Errore di connessione. Riprova.");
+        }
+    }
+
+    function renderGrid(items, query) {
+        const grid = document.getElementById('gridContainer');
+        grid.innerHTML = "";
+        if (items.length === 0) { renderEmptyState(`Nessun libro trovato.`); return; }
+        
+        items.forEach((book, idx) => {
+            const delay = `style="animation-delay: ${idx * 50}ms"`;
+            const bookStr = JSON.stringify(book).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+            
+            const html = `
+            <div class="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col overflow-hidden animate-fade-up group cursor-pointer" ${delay} onclick='openBookModal(${bookStr})'>
+                <div class="h-32 w-full flex items-center justify-center relative overflow-hidden" style="background:${book.color || '#ccc'}">
+                    <div class="absolute inset-0 bg-black/10"></div>
+                    <div class="w-16 h-24 bg-white/20 backdrop-blur-md rounded shadow-lg border border-white/30 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform relative z-10">📖</div>
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <h4 class="font-display font-bold text-lg text-slate-800 mb-1 line-clamp-1">${book.title}</h4>
+                    <p class="text-sm text-slate-400 mb-3">${book.author}</p>
+                    <p class="text-sm text-slate-500 line-clamp-3 mb-6 flex-grow">${book.summary}</p>
+                    <div class="flex justify-between items-center mt-auto pt-4 border-t border-slate-100">
+                        <span class="text-emerald-600 font-bold text-lg">${book.price ? book.price.toFixed(2) : '15.00'}€</span>
+                        <span class="text-indigo-600 font-bold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">Dettagli <i data-lucide="arrow-right" class="w-4 h-4"></i></span>
+                    </div>
+                </div>
+            </div>`;
+            grid.innerHTML += html;
+        });
+        if(typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    // --- MODAL & CHAT ---
+    function openBookModal(book) {
+        CURRENT_ACTIVE_BOOK = book;
+        const m = document.getElementById('aiModal');
+        m.classList.remove('hidden'); m.classList.add('flex');
+        setTimeout(()=>document.getElementById('aiModalInner').classList.remove('scale-95','opacity-0'),10);
+        
+        const cleanTitle = book.title.replace(/[^\w\s]/gi, '');
+        const amazonLink = `https://www.amazon.it/s?k=${encodeURIComponent(cleanTitle + ' ' + book.author)}&tag=${AFFILIATE_TAG}`;
+
+        document.getElementById('aiModalBody').innerHTML = `
+            <div class="p-6 bg-slate-50 border-b border-slate-100 flex gap-4 items-start relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-slate-50 to-indigo-50 opacity-50"></div>
+                <div class="w-20 h-28 rounded-lg shadow-md flex-shrink-0 flex items-center justify-center text-3xl relative z-10" style="background:${book.color}">📖</div>
+                <div class="relative z-10">
+                    <h2 class="font-display font-bold text-2xl text-slate-900 leading-tight mb-1">${book.title}</h2>
+                    <p class="text-slate-500 font-medium">${book.author}</p>
+                    <div class="flex gap-2 mt-3">
+                        <span class="px-2 py-1 bg-white border border-slate-200 rounded text-xs font-bold text-slate-600">⭐ ${book.rating || 4.5}</span>
+                        <span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-bold">Best Seller</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-6 space-y-6">
+                <div>
+                    <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2"><i data-lucide="align-left" class="w-4 h-4 text-indigo-500"></i> Analisi del Libro</h4>
+                    <p class="text-sm text-slate-600 leading-relaxed">${book.summary}</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="askAI('Consigliami 3 motivi per leggere questo libro')" class="p-3 bg-indigo-50 hover:bg-indigo-100 rounded-xl text-left transition-colors group">
+                        <span class="block text-indigo-600 font-bold text-xs mb-1 group-hover:scale-105 transition-transform">✨ Ispirazione</span>
+                        <span class="block text-slate-700 text-xs font-medium">Perché leggerlo?</span>
+                    </button>
+                    <button onclick="askAI('Quali sono i concetti chiave?')" class="p-3 bg-amber-50 hover:bg-amber-100 rounded-xl text-left transition-colors group">
+                        <span class="block text-amber-600 font-bold text-xs mb-1 group-hover:scale-105 transition-transform">🧠 Sintesi</span>
+                        <span class="block text-slate-700 text-xs font-medium">Concetti chiave</span>
+                    </button>
+                </div>
+
+                <!-- Chat Area -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-4 h-48 overflow-y-auto flex flex-col gap-3 shadow-inner" id="chatContainer">
+                    <div class="bg-slate-100 p-3 rounded-xl rounded-tl-none text-sm text-slate-600 self-start max-w-[85%]">
+                        Ciao! Sono il protagonista di "${book.title}". Chiedimi qualsiasi cosa sulla mia storia!
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="chatInput" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-indigo-500 transition-colors" placeholder="Fai una domanda al protagonista..." onkeypress="if(event.key==='Enter') sendUserChat()">
+                    <button onclick="sendUserChat()" class="bg-indigo-600 hover:bg-indigo-500 text-white p-3 rounded-xl transition-colors shadow-lg shadow-indigo-500/20"><i data-lucide="send" class="w-4 h-4"></i></button>
+                </div>
+
+                <a href="${amazonLink}" target="_blank" class="block w-full py-4 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold text-center rounded-xl shadow-lg shadow-orange-500/20 transition-all hover:-translate-y-1 flex items-center justify-center gap-2">
+                    Acquista su Amazon <i data-lucide="external-link" class="w-4 h-4"></i>
+                </a>
+            </div>
+        `;
+        lucide.createIcons();
+    }
+
+    function closeAiModal() {
+        document.getElementById('aiModalInner').classList.add('scale-95','opacity-0');
+        setTimeout(()=>{ document.getElementById('aiModal').classList.add('hidden'); document.getElementById('aiModal').classList.remove('flex'); },300);
+    }
+
+    async function sendUserChat() {
+        const inp = document.getElementById('chatInput');
+        const txt = inp.value.trim();
+        if(!txt) return;
+        askAI(txt, 'chat');
+        inp.value = '';
+    }
+
+    async function askAI(question, type) {
+        const cont = document.getElementById('chatContainer');
+        
+        if (type === 'chat') {
+             cont.innerHTML += `<div class="bg-indigo-50 border border-indigo-100 p-3 rounded-xl rounded-tr-none text-sm text-slate-800 self-end max-w-[85%]">${question}</div>`;
+        } else {
+             cont.innerHTML += `<div class="bg-indigo-50 border border-indigo-100 p-3 rounded-xl text-center text-xs text-slate-500 font-bold uppercase tracking-wider">Analisi in corso...</div>`;
+        }
+        cont.scrollTop = cont.scrollHeight;
+
+        const loadingId = 'loading-' + Date.now();
+        cont.innerHTML += `<div id="${loadingId}" class="bg-slate-100 p-3 rounded-xl rounded-tl-none text-sm text-slate-500 self-start italic">Sto elaborando...</div>`;
+        cont.scrollTop = cont.scrollHeight;
+
+        let systemPrompt = "";
+        if (type === 'chat') {
+            systemPrompt = `Sei il protagonista principale del libro "${CURRENT_ACTIVE_BOOK.title}" di ${CURRENT_ACTIVE_BOOK.author}. Identificati brevemente se non l'hai fatto e rispondi alla domanda dell'utente: "${question}". Rispondi in prima persona, con il tono e la personalità del personaggio. Rispondi in italiano.`;
+        } else {
+            systemPrompt = `Sei un esperto critico letterario. Analizza il libro "${CURRENT_ACTIVE_BOOK.title}" di ${CURRENT_ACTIVE_BOOK.author}. Domanda: "${question}". Rispondi in italiano in modo conciso e professionale (max 2 frasi).`;
+        }
+        
+        try {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({contents: [{parts: [{text: systemPrompt}]}]})});
+            const data = await res.json();
+            const ans = data.candidates[0].content.parts[0].text;
+            document.getElementById(loadingId).innerText = ans;
+            document.getElementById(loadingId).classList.remove('italic', 'text-slate-500');
+        } catch(e) {
+            document.getElementById(loadingId).innerText = "Errore di connessione.";
+        }
+    }
+
+    // --- QUIZ FUNCTIONS ---
+    function startQuiz() { currentQuizIdx = 0; quizScore = 0; renderQuiz(); }
+    
+    function renderQuiz() {
+        const grid = document.getElementById('gridContainer');
+        if(currentQuizIdx >= QUIZ_QUESTIONS.length) {
+            grid.innerHTML = `
+            <div class="col-span-full bg-white rounded-3xl p-10 text-center shadow-lg border border-amber-100 animate-fade-up">
+                <div class="w-20 h-20 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-6"><i data-lucide="trophy" class="w-10 h-10"></i></div>
+                <h3 class="font-bold text-2xl mb-2 text-slate-800">Quiz Completato!</h3>
+                <p class="text-slate-500 mb-8">Punteggio: <strong class="text-amber-600">${quizScore}/${QUIZ_QUESTIONS.length}</strong></p>
+                <button onclick="generateAIQuiz()" class="text-sm text-slate-400 font-bold hover:text-slate-600 flex items-center justify-center gap-2 mx-auto">
+                    <i data-lucide="rotate-cw" class="w-4 h-4"></i> Carica Nuove Domande
+                </button>
+            </div>`;
+            lucide.createIcons();
+            return;
+        }
+        const q = QUIZ_QUESTIONS[currentQuizIdx];
+        grid.innerHTML = `
+        <div class="col-span-full max-w-xl mx-auto bg-white rounded-3xl p-8 shadow-lg border border-slate-100 animate-fade-up">
+            <div class="flex justify-between items-center mb-6">
+                <span class="text-xs font-bold uppercase tracking-wider text-amber-500 bg-amber-50 px-3 py-1 rounded-full">Domanda ${currentQuizIdx+1}</span>
+            </div>
+            <h3 class="font-display font-bold text-xl text-slate-800 mb-6 leading-snug">${q.q}</h3>
+            <div class="grid gap-3 mb-6">
+                ${q.options.map((o,i)=>`<button onclick="checkAns(this,${i})" class="option-btn w-full p-4 border-2 border-slate-100 rounded-xl text-left font-bold text-slate-600 hover:border-amber-200 hover:bg-amber-50 transition-all">${o}</button>`).join('')}
+            </div>
+        </div>`;
+        lucide.createIcons();
+    }
+
+    function checkAns(btn, i) {
+        const correct = QUIZ_QUESTIONS[currentQuizIdx].ans;
+        const allBtns = btn.parentElement.querySelectorAll('button');
+        allBtns.forEach(b => b.disabled = true);
+        if(i===correct) { btn.classList.add('option-correct'); quizScore++; } 
+        else { btn.classList.add('option-wrong'); allBtns[correct].classList.add('option-correct'); }
+        setTimeout(()=>{ currentQuizIdx++; renderQuiz(); }, 1500);
+    }
+
+    async function generateAIQuiz() {
+        document.getElementById('gridContainer').innerHTML = `<div class="col-span-full text-center py-12"><div class="w-12 h-12 border-4 border-amber-200 border-t-amber-600 rounded-full animate-spin mx-auto mb-4"></div><p>Genero domande...</p></div>`;
+        const prompt = `Genera 3 domande quiz letteratura a risposta multipla. JSON array: [{"q": "Domanda", "options": ["A","B","C","D"], "ans": 0}]. Solo JSON.`;
+        try {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({contents: [{parts: [{text: prompt}]}]})});
+            const data = await res.json();
+            const txt = data.candidates[0].content.parts[0].text.replace(/```json/g,'').replace(/```/g,'').trim();
+            QUIZ_QUESTIONS = JSON.parse(txt);
+            startQuiz();
+        } catch(e) { startQuiz(); }
+    }
   </script>
 </body>
 </html>
